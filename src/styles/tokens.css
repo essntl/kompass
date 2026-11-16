@@ -1,0 +1,268 @@
+/*
+ * Kompass design tokens – the single source of truth for colour, type, radius,
+ * elevation and motion. Owned by the orchestrator (see docs/contracts.md §4).
+ *
+ * Direction: "Nordic workwear". Warm paper grounds, deep spruce-teal as the
+ * primary, hi-vis amber as the one signal colour. Calm, flat surfaces with
+ * hairline borders; colour is spent on subjects and transport modes, not chrome.
+ *
+ * Rules:
+ *  - Components use the semantic Tailwind utilities generated below
+ *    (bg-bg, bg-surface, text-ink, text-ink-2, border-line, bg-primary …).
+ *  - No raw hex values in components. No violet/purple anywhere.
+ *  - Light/dark is switched with [data-theme] on <html>; never use `dark:` to
+ *    re-colour a semantic token.
+ */
+
+@import 'tailwindcss';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+:root,
+[data-theme='light'] {
+  color-scheme: light;
+
+  /* grounds */
+  --bg: #f5f3ee;
+  --surface: #ffffff;
+  --surface-2: #ece9e1;
+  --overlay: rgb(20 32 29 / 0.42);
+
+  /* text */
+  --ink: #14201d;
+  --ink-2: #47544f;
+  --ink-3: #66716d;
+  --line: #e0dcd2;
+  --line-strong: #c9c4b8;
+
+  /* brand */
+  --primary: #0e5a50;
+  --primary-hover: #0a4a42;
+  --primary-ink: #ffffff;
+  --primary-soft: #dcebe6;
+  --primary-soft-ink: #0b4a42;
+
+  --accent: #f2a20c;
+  --accent-ink: #2a1d00;
+  --accent-soft: #fbedc8;
+  --accent-soft-ink: #6b4500;
+
+  /* status */
+  --danger: #b93a2b;
+  --danger-soft: #f8e2dd;
+  --danger-soft-ink: #8a2418;
+  --success: #2b7a4b;
+  --success-soft: #dcefe3;
+  --success-soft-ink: #1d5a36;
+  --info: #23629f;
+  --info-soft: #dde9f5;
+  --info-soft-ink: #1a4c7d;
+
+  /* categorical subject palette: solid = bars/dots, soft = card fills, ink = text on soft */
+  --subj-1: #0e7c6b;  --subj-1-soft: #d9eee9;  --subj-1-ink: #0a5247;  /* teal */
+  --subj-2: #c97a06;  --subj-2-soft: #fbecd0;  --subj-2-ink: #7a4a00;  /* amber */
+  --subj-3: #c8553d;  --subj-3-soft: #f9e2db;  --subj-3-ink: #8a3222;  /* coral */
+  --subj-4: #2f6fb0;  --subj-4-soft: #deeaf6;  --subj-4-ink: #1d4c7e;  /* blue */
+  --subj-5: #4f8a2f;  --subj-5-soft: #e3f0d9;  --subj-5-ink: #35601d;  /* green */
+  --subj-6: #b4466f;  --subj-6-soft: #f7dfe8;  --subj-6-ink: #812a4b;  /* rose */
+  --subj-7: #52646e;  --subj-7-soft: #e3e8eb;  --subj-7-ink: #37464f;  /* slate */
+  --subj-8: #8a6a2a;  --subj-8-soft: #f0e7d3;  --subj-8-ink: #5e4717;  /* ochre */
+
+  /* calendar event kinds that are not classes */
+  --event-absence: var(--danger);
+  --event-absence-soft: var(--danger-soft);
+  --event-absence-ink: var(--danger-soft-ink);
+  --event-custom: var(--info);
+  --event-custom-soft: var(--info-soft);
+  --event-custom-ink: var(--info-soft-ink);
+  --event-deadline: var(--accent);
+  --event-deadline-soft: var(--accent-soft);
+  --event-deadline-ink: var(--accent-soft-ink);
+
+  /* transport modes */
+  --mode-foot: #66716d;
+  --mode-bus: #d0342c;
+  --mode-tram: #0b84d8;
+  --mode-metro: #e2700d;
+  --mode-rail: #1f3f8f;
+  --mode-water: #0a7e9c;
+  --mode-coach: #4f8a2f;
+  --mode-bicycle: #52646e;
+  --mode-other: #52646e;
+
+  /* elevation – flat by default, shadows only for things that float */
+  --shadow-1: 0 1px 2px rgb(20 32 29 / 0.05), 0 1px 1px rgb(20 32 29 / 0.03);
+  --shadow-2: 0 6px 20px -6px rgb(20 32 29 / 0.14), 0 2px 6px rgb(20 32 29 / 0.05);
+  --shadow-3: 0 20px 48px -12px rgb(20 32 29 / 0.24);
+
+  --focus-ring: #0e5a50;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #0d1412;
+  --surface: #151e1b;
+  --surface-2: #1d2925;
+  --overlay: rgb(0 0 0 / 0.6);
+
+  --ink: #ecf1ee;
+  --ink-2: #b1bcb7;
+  --ink-3: #8a9792;
+  --line: #26332f;
+  --line-strong: #364540;
+
+  --primary: #56c7b1;
+  --primary-hover: #6fd4c0;
+  --primary-ink: #06211c;
+  --primary-soft: #16332d;
+  --primary-soft-ink: #8fe0cf;
+
+  --accent: #f6b73c;
+  --accent-ink: #2a1d00;
+  --accent-soft: #3a2c0d;
+  --accent-soft-ink: #f8cf7c;
+
+  --danger: #ef7b6b;
+  --danger-soft: #3b1c18;
+  --danger-soft-ink: #f6a99d;
+  --success: #62c088;
+  --success-soft: #16301f;
+  --success-soft-ink: #93d9ae;
+  --info: #6aa9e6;
+  --info-soft: #152a40;
+  --info-soft-ink: #a3caf2;
+
+  --subj-1: #4fc3ae;  --subj-1-soft: #14332d;  --subj-1-ink: #8fe0cf;
+  --subj-2: #f0ad3d;  --subj-2-soft: #3a2b0e;  --subj-2-ink: #f6cd85;
+  --subj-3: #ee8a72;  --subj-3-soft: #3d1f18;  --subj-3-ink: #f6b3a2;
+  --subj-4: #6fa9e4;  --subj-4-soft: #162b41;  --subj-4-ink: #a8cdf3;
+  --subj-5: #8cc56a;  --subj-5-soft: #1f3316;  --subj-5-ink: #b6dd9e;
+  --subj-6: #e88aae;  --subj-6-soft: #3b1a28;  --subj-6-ink: #f3b4cb;
+  --subj-7: #9aaeb9;  --subj-7-soft: #222d33;  --subj-7-ink: #c3d1d9;
+  --subj-8: #cfae69;  --subj-8-soft: #322813;  --subj-8-ink: #e3cc9b;
+
+  --mode-foot: #8a9792;
+  --mode-bus: #f0635a;
+  --mode-tram: #4aa9ef;
+  --mode-metro: #f59243;
+  --mode-rail: #7b9bea;
+  --mode-water: #45b4d0;
+  --mode-coach: #8cc56a;
+  --mode-bicycle: #9aaeb9;
+  --mode-other: #9aaeb9;
+
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-2: 0 8px 24px -8px rgb(0 0 0 / 0.55);
+  --shadow-3: 0 24px 56px -12px rgb(0 0 0 / 0.7);
+
+  --focus-ring: #56c7b1;
+}
+
+/*
+ * Map the variables into Tailwind's theme so utilities exist:
+ * bg-bg, bg-surface, text-ink-2, border-line, bg-primary-soft, text-subj-3-ink,
+ * rounded-lg, shadow-2, font-display, text-title …
+ */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-overlay: var(--overlay);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-ink: var(--primary-ink);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-soft-ink: var(--primary-soft-ink);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-soft-ink: var(--accent-soft-ink);
+
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-soft-ink: var(--danger-soft-ink);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-soft-ink: var(--success-soft-ink);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-soft-ink: var(--info-soft-ink);
+
+  --color-subj-1: var(--subj-1);  --color-subj-1-soft: var(--subj-1-soft);  --color-subj-1-ink: var(--subj-1-ink);
+  --color-subj-2: var(--subj-2);  --color-subj-2-soft: var(--subj-2-soft);  --color-subj-2-ink: var(--subj-2-ink);
+  --color-subj-3: var(--subj-3);  --color-subj-3-soft: var(--subj-3-soft);  --color-subj-3-ink: var(--subj-3-ink);
+  --color-subj-4: var(--subj-4);  --color-subj-4-soft: var(--subj-4-soft);  --color-subj-4-ink: var(--subj-4-ink);
+  --color-subj-5: var(--subj-5);  --color-subj-5-soft: var(--subj-5-soft);  --color-subj-5-ink: var(--subj-5-ink);
+  --color-subj-6: var(--subj-6);  --color-subj-6-soft: var(--subj-6-soft);  --color-subj-6-ink: var(--subj-6-ink);
+  --color-subj-7: var(--subj-7);  --color-subj-7-soft: var(--subj-7-soft);  --color-subj-7-ink: var(--subj-7-ink);
+  --color-subj-8: var(--subj-8);  --color-subj-8-soft: var(--subj-8-soft);  --color-subj-8-ink: var(--subj-8-ink);
+
+  --color-mode-foot: var(--mode-foot);
+  --color-mode-bus: var(--mode-bus);
+  --color-mode-tram: var(--mode-tram);
+  --color-mode-metro: var(--mode-metro);
+  --color-mode-rail: var(--mode-rail);
+  --color-mode-water: var(--mode-water);
+  --color-mode-coach: var(--mode-coach);
+  --color-mode-bicycle: var(--mode-bicycle);
+  --color-mode-other: var(--mode-other);
+
+  --shadow-1: var(--shadow-1);
+  --shadow-2: var(--shadow-2);
+  --shadow-3: var(--shadow-3);
+}
+
+@theme {
+  /* type */
+  --font-display: 'Bricolage Grotesque Variable', 'Figtree Variable', system-ui, sans-serif;
+  --font-sans: 'Figtree Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* one type scale, used everywhere: text-caption … text-display */
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1rem;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.25rem;
+  --text-body: 1rem;
+  --text-body--line-height: 1.5rem;
+  --text-heading: 1.1875rem;
+  --text-heading--line-height: 1.625rem;
+  --text-title: 1.5rem;
+  --text-title--line-height: 1.875rem;
+  --text-display: 2rem;
+  --text-display--line-height: 2.25rem;
+  --text-hero: 2.75rem;
+  --text-hero--line-height: 2.875rem;
+
+  /* one radius scale: sm = chips/inputs, md = buttons, lg = cards, xl = sheets */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* layout */
+  --breakpoint-desktop: 64rem; /* ≥1024px: sidebar instead of bottom nav */
+}
+
+:root {
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+
+  /* layout constants shared by the shell and pages */
+  --nav-height: 64px; /* bottom navigation, without the safe-area inset */
+  --sidebar-width: 264px;
+  --content-max: 720px; /* reading width for single-column pages */
+  --tap: 44px; /* minimum touch target */
+}
