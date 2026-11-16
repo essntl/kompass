@@ -68,7 +68,7 @@ function ReminderRow({ reminder, now }: { reminder: Reminder; now: Date }) {
     <Link
       to={reminder.href}
       className={cn(
-        'flex min-h-16 items-center gap-3 px-4 py-3 text-left',
+        'relative flex min-h-16 items-center gap-3 px-4 py-3 text-left',
         'transition-[background-color] duration-150 ease-out hover:bg-surface-hover active:bg-surface-2',
         'focus-visible:-outline-offset-2',
       )}
@@ -79,23 +79,25 @@ function ReminderRow({ reminder, now }: { reminder: Reminder; now: Date }) {
       >
         {kind.icon}
       </span>
+      {/* The time sits under the title, not beside it, so the title gets the row's width
+          and wraps to two lines instead of being cut off in the narrow desktop column. */}
       <span className="min-w-0 flex-1">
         <span className="sr-only">{kind.label}: </span>
-        <span className="block truncate font-semibold text-ink">{reminder.title}</span>
+        <span className="line-clamp-2 font-semibold text-ink">{reminder.title}</span>
         {reminder.detail ? (
           <span className="block truncate text-small text-ink-2">{reminder.detail}</span>
         ) : null}
+        {when ? (
+          urgent ? (
+            <Badge tone="accent" icon={<Clock />} className="mt-1.5">
+              <span className="sr-only">Snart: </span>
+              {when}
+            </Badge>
+          ) : (
+            <span className="mt-0.5 block text-small text-ink-2 nums">{when}</span>
+          )
+        ) : null}
       </span>
-      {when ? (
-        urgent ? (
-          <Badge tone="accent" icon={<Clock />}>
-            <span className="sr-only">Snart: </span>
-            {when}
-          </Badge>
-        ) : (
-          <span className="shrink-0 text-small text-ink-2 nums">{when}</span>
-        )
-      ) : null}
       <ChevronRight aria-hidden className="-mr-1 size-5 shrink-0 text-ink-3" />
     </Link>
   );

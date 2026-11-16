@@ -9,7 +9,7 @@ import { useApprenticeshipStore } from './apprenticeships';
 import { countUnread, summariseThreads, useMessagesStore } from './messages';
 import { usePortfolioStore } from './portfolio';
 import { resetDemoData } from './reset';
-import { useSettingsStore } from './settings';
+import { normaliseYear, useSettingsStore } from './settings';
 import { useTimetableStore } from './timetable';
 
 // These run in Node: the stores fall back to in-memory storage (see ./persist.ts).
@@ -329,5 +329,14 @@ describe('resetDemoData', () => {
     expect(countUnread(messages().messages)).toBe(1);
     expect(portfolio().entries.map((e) => e.id)).toContain('pe-weld');
     expect(apprenticeships().savedIds).toEqual(SEED_SAVED_LISTING_IDS);
+  });
+});
+
+describe('settings', () => {
+  it('uses the official spelling Vg1 and normalises older values', () => {
+    expect(useSettingsStore.getState().profile.year).toBe('Vg1');
+    expect(normaliseYear('VG2')).toBe('Vg2');
+    expect(normaliseYear(' vg3 ')).toBe('Vg3');
+    expect(normaliseYear('Påbygg')).toBe('Påbygg');
   });
 });

@@ -4,7 +4,7 @@
  */
 import type { PortfolioDescribeRequest } from '../../shared/api';
 import type { CompetenceDescription, SuggestedGoal } from '../../shared/types';
-import { leadSentences, lowerFirst } from './text';
+import { asFirstPerson, joinList, leadSentences, lowerFirst } from './text';
 
 /** Stems found in the title or note → the skill they point to. Order = priority. */
 const SKILL_RULES: Array<[RegExp, string]> = [
@@ -165,20 +165,25 @@ function goalsFor(programme: string): SuggestedGoal[] {
   return (match?.[1] ?? DEFAULT_GOALS).slice(0, 2).map(({ text, why }) => ({ text, why }));
 }
 
+/** The note's first sentences; a first sentence without a subject ("Sveiset …") gets "Jeg". */
+function notePart(note: string): string {
+  const [first = '', ...rest] = leadSentences(note, 3).split(/(?<=[.!?])\s+/);
+  return [asFirstPerson(first) || first, ...rest].join(' ');
+}
+
 export function buildMockCompetence(request: PortfolioDescribeRequest): CompetenceDescription {
   const title = request.title.trim();
   const note = request.note.trim();
   const skills = detectSkills(`${title} ${note}`);
   const area = request.subject?.trim() || request.programme.trim() || 'yrkesfag';
 
-  const [first, second] = skills.map(lowerFirst);
   const summary =
     `Arbeidet «${title}» viser at jeg kan gjennomføre en praktisk oppgave i ${lowerFirst(area)}, ` +
-    `med vekt på ${first}${second ? ` og ${second}` : ''}.`;
+    `med vekt på ${joinList(skills.slice(0, 2).map(lowerFirst))}.`;
 
   // Only the student's own words: the mock must not add steps the student never described.
   const whatWasDone = note
-    ? `Jeg jobbet med oppgaven «${title}». ${leadSentences(note, 3)}`
+    ? `Jeg jobbet med oppgaven «${title}». ${notePart(note)}`
     : `Jeg jobbet med oppgaven «${title}». Legg til et notat om hva du gjorde, så blir beskrivelsen mer presis.`;
 
   return {

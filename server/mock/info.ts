@@ -35,6 +35,42 @@ export const CANNED_ANSWERS: CannedAnswer[] = [
     ],
   },
   {
+    id: 'ikke-laereplass',
+    keywords: ['alternativ', 'alternativt', 'vg3 i skole', 'fagopplæringskontor', 'fagopplæringskontoret'],
+    strong: [
+      'ikke får læreplass',
+      'ikke fikk læreplass',
+      'ikke få læreplass',
+      'får ikke læreplass',
+      'fikk ikke læreplass',
+      'uten læreplass',
+      'mangler læreplass',
+    ],
+    text:
+      'Hvis du har søkt læreplass, men ikke får det, har du rett til et annet opplæringstilbud. Ofte er det Vg3 i skole, der du tar det siste året på skolen, gjerne med praksis i en bedrift.\n\n' +
+      'For å ha den retten må du ha registrert søknaden om læreplass i Vigo innen fristen, som vanligvis er 1. mars. Det er fylkeskommunen som har ansvaret for opplæringen din.\n\n' +
+      '- Fortsett å kontakte bedrifter selv. Mange får læreplass også etter fristen.\n' +
+      '- Ta kontakt med fagopplæringskontoret i fylket ditt. De kan fortelle hva som gjelder for faget ditt og hjelpe deg videre.',
+    sources: [
+      { id: 'utdanning-ikke-laereplass', why: 'Forklarer hva du har krav på hvis du ikke får læreplass.' },
+      { id: 'vilbli-soke-laereplass', why: 'Forklarer søknaden i Vigo og fristen du må holde.' },
+    ],
+  },
+  {
+    id: 'y-veien',
+    keywords: ['ingeniør', 'ingeniørfag', 'høgskole', 'høyskole', 'universitet', 'forkurs'],
+    // "Uten påbygging" is the point of Y-veien, so it outweighs the påbygging answer.
+    strong: ['y-veien', 'y-vei', 'yveien', 'uten påbygg', 'uten påbygging'],
+    text:
+      'Y-veien lar deg søke enkelte studier på universitet og høgskole med yrkesfag fra videregående, uten å ta påbygging eller forkurs først.\n\n' +
+      'Du må ha relevant yrkeskompetanse, som regel et fagbrev som passer til studiet. Studiene er oftest innen ingeniørfag, realfag og maritime fag.\n\n' +
+      'Hvilke studier som har Y-veien, og hvilke fagbrev som gir opptak, er ulikt fra sted til sted. Sjekk studiet du er interessert i, eller spør rådgiveren din.',
+    sources: [
+      { id: 'utdanning-y-veien', why: 'Forklarer hva Y-veien er og hvem som kan søke.' },
+      { id: 'vilbli-pabygg', why: 'Viser den andre veien til studier: påbygging til studiekompetanse.' },
+    ],
+  },
+  {
     id: 'intervju',
     keywords: ['intervju', 'cv', 'søknadstekst', 'presentere', 'ringe', 'kontakte', 'jobbsøk'],
     text:
@@ -185,21 +221,36 @@ const tokenize = (text: string): string[] =>
     .filter(Boolean);
 
 function matches(tokens: string[], question: string, keyword: string): boolean {
-  if (keyword.includes(' ')) return question.includes(keyword);
+  // Phrases and hyphenated names ("ikke får læreplass", "y-veien") match as text.
+  if (/[^\p{L}\p{N}]/u.test(keyword)) return question.includes(keyword);
   return tokens.some((token) => token === keyword || (keyword.length >= 5 && token.startsWith(keyword)));
 }
 
-/** The canned answer with the most keyword hits, or `null` when nothing matches. */
+/** How many words a keyword has: "ikke får læreplass" names a narrower topic than "læreplass". */
+const wordCount = (keyword: string) => keyword.split(/[^\p{L}\p{N}]+/u).filter(Boolean).length;
+
+/**
+ * The canned answer with the most keyword hits, or `null` when nothing matches. On a tie
+ * the most specific topic wins: the one whose best hit is the longest phrase.
+ */
 export function pickCannedAnswer(question: string): CannedAnswer | null {
   const lower = question.toLowerCase();
   const tokens = tokenize(question);
 
-  let best: { answer: CannedAnswer; score: number } | null = null;
+  let best: { answer: CannedAnswer; score: number; specificity: number } | null = null;
   for (const answer of CANNED_ANSWERS) {
-    const strongHits = (answer.strong ?? []).filter((keyword) => matches(tokens, lower, keyword)).length;
-    const hits = answer.keywords.filter((keyword) => matches(tokens, lower, keyword)).length;
-    const score = strongHits * 3 + hits;
-    if (score > 0 && (!best || score > best.score)) best = { answer, score };
+    const strongHits = (answer.strong ?? []).filter((keyword) => matches(tokens, lower, keyword));
+    const hits = answer.keywords.filter((keyword) => matches(tokens, lower, keyword));
+    const score = strongHits.length * 3 + hits.length;
+    if (score === 0) continue;
+    const specificity = Math.max(...[...strongHits, ...hits].map(wordCount));
+    if (
+      !best ||
+      score > best.score ||
+      (score === best.score && specificity > best.specificity)
+    ) {
+      best = { answer, score, specificity };
+    }
   }
   return best?.answer ?? null;
 }

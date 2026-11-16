@@ -1,7 +1,7 @@
 import type { Subject } from '@shared/types';
 
 /**
- * Subjects for VG1 Teknologi- og industrifag: the two programme subjects, YFF and the
+ * Subjects for Vg1 Teknologi- og industrifag: the two programme subjects, YFF and the
  * common core subjects. Ids are stable: the timetable, teachers and portfolio refer to them.
  */
 export const SUBJECT_IDS = {

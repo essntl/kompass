@@ -88,7 +88,7 @@ describe('API server (mock mode)', () => {
       title: 'Dreid aksling',
       note: 'Dreide en aksling etter tegning.',
       programme: 'Teknologi- og industrifag',
-      year: 'VG1',
+      year: 'Vg1',
     });
     expect(response.status).toBe(200);
     const { competence } = await response.json();
@@ -123,7 +123,7 @@ describe('API server (mock mode)', () => {
 
   it('streams an application draft and ends with done', async () => {
     const response = await postJson('/api/ai/application-text', {
-      student: { name: 'Sara Nilsen', year: 'VG1', programme: 'Teknologi- og industrifag' },
+      student: { name: 'Sara Nilsen', year: 'Vg1', programme: 'Teknologi- og industrifag' },
       entries: [],
     });
     const body = await response.text();

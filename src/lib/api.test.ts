@@ -137,7 +137,7 @@ describe('streaming routes', () => {
     );
     const onDelta = vi.fn();
     const error = await streamApplicationText(
-      { student: { name: 'Sara', year: 'VG1', programme: 'TIF' }, entries: [] },
+      { student: { name: 'Sara', year: 'Vg1', programme: 'TIF' }, entries: [] },
       { onDelta },
     ).catch((err) => err);
 

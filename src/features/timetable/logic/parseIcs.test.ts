@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { addressQuery } from './offsiteLocation';
 import { IcsParseError, parseIcs, resolveTzid, subjectNameFromSummary } from './parseIcs';
 
 /** Monday 16 November 2026, 11:00 in Oslo. */
@@ -542,6 +543,11 @@ describe('parseIcs – bundled sample file', () => {
         'Yrkesfaglig fordypning',
       ]),
     );
+    // YFF is at the work placement: LOCATION carries its street address.
+    const yff = thisWeek.find((e) => e.title === 'Yrkesfaglig fordypning');
+    expect(yff?.room).toBe('Dronning Margretes vei 15, Oslo');
+    expect(addressQuery(yff?.room)?.query).toBe('Dronning Margretes vei 15, Oslo');
+    expect(thisWeek.filter((e) => addressQuery(e.room))).toHaveLength(1);
     // Christmas break is excluded.
     expect(result.events.some((e) => e.start.startsWith('2026-12-2'))).toBe(false);
     expect(result.events.find((e) => e.allDay)?.title).toBe('Planleggingsdag – ingen undervisning');

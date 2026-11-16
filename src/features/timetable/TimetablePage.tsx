@@ -13,7 +13,6 @@ import {
 import {
   addDaysISO,
   formatDate,
-  formatDayLong,
   isoWeek,
   relativeDay,
   startOfWeekISO,
@@ -30,6 +29,7 @@ import { Legend } from './components/Legend';
 import { LIST_DAYS, ListView } from './components/ListView';
 import { SwipePager, type SwipePagerHandle } from './components/SwipePager';
 import { WeekView } from './components/WeekView';
+import { dayTitles, upperFirst } from './logic/labels';
 import type { TimetableView } from './logic/layout';
 import { useRememberedView } from './useRememberedView';
 
@@ -46,20 +46,27 @@ function rangeLabel(from: ISODate, to: ISODate, now: Date): string {
   return `${strip(formatDate(from), from)} – ${strip(formatDate(to), to)}`;
 }
 
-function periodLabel(view: TimetableView, anchor: ISODate, now: Date): { title: string; detail: string } {
+/** `shortTitle` is shown on narrow phones, where the long day name would not fit. */
+function periodLabel(
+  view: TimetableView,
+  anchor: ISODate,
+  now: Date,
+): { title: string; shortTitle: string; detail: string } {
   if (view === 'dag') {
     const relative = relativeDay(anchor, now);
-    const long = formatDayLong(anchor);
+    const { long, short } = dayTitles(anchor);
     return {
-      title: long.charAt(0).toUpperCase() + long.slice(1),
-      detail: ['i dag', 'i morgen', 'i går'].includes(relative) ? relative.charAt(0).toUpperCase() + relative.slice(1) : `Uke ${isoWeek(anchor)}`,
+      title: long,
+      shortTitle: short,
+      detail: ['i dag', 'i morgen', 'i går'].includes(relative) ? upperFirst(relative) : `Uke ${isoWeek(anchor)}`,
     };
   }
   if (view === 'uke') {
     const days = weekDays(anchor, 7);
-    return { title: `Uke ${isoWeek(anchor)}`, detail: rangeLabel(days[0] ?? anchor, days[4] ?? anchor, now) };
+    const title = `Uke ${isoWeek(anchor)}`;
+    return { title, shortTitle: title, detail: rangeLabel(days[0] ?? anchor, days[4] ?? anchor, now) };
   }
-  return { title: 'Agenda', detail: rangeLabel(anchor, addDaysISO(anchor, LIST_DAYS - 1), now) };
+  return { title: 'Agenda', shortTitle: 'Agenda', detail: rangeLabel(anchor, addDaysISO(anchor, LIST_DAYS - 1), now) };
 }
 
 /** Elements where ←/→ already mean something. */
@@ -161,8 +168,12 @@ export function TimetablePage() {
 
         <div className="flex items-center gap-1">
           <div className="min-w-0 flex-1" aria-live="polite" aria-atomic="true">
-            <h2 className="truncate font-display text-heading font-semibold text-ink">{label.title}</h2>
-            <p className="truncate text-small text-ink-2 nums">{label.detail}</p>
+            {/* No truncation: a short day name on narrow phones, and wrapping as a last resort. */}
+            <h2 className="font-display text-heading font-semibold break-words text-ink">
+              <span className="min-[440px]:hidden">{label.shortTitle}</span>
+              <span className="max-[439.98px]:hidden">{label.title}</span>
+            </h2>
+            <p className="text-small break-words text-ink-2 nums">{label.detail}</p>
           </div>
           <Button
             variant="secondary"

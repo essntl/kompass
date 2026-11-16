@@ -58,7 +58,7 @@ export function TravelPage() {
   );
 
   return (
-    <Page>
+    <Page width="wide">
       <PageHeader
         title="Reise"
         subtitle={subtitle}
@@ -99,37 +99,59 @@ export function TravelPage() {
         </p>
       ) : null}
 
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={`${date}:${plan.status === 'ready' ? 'ready' : plan.status}`}
-          variants={fade}
-          initial="hidden"
-          animate="show"
-          exit="exit"
-          className="flex flex-col gap-6"
-        >
-          <PlanContent plan={plan} date={date} now={now} events={events} />
-        </motion.div>
-      </AnimatePresence>
+      {/* One column on phones. On desktop the trip to school gets the main column and the
+          rest of the day (between trips, home, walking speed) sits beside it. */}
+      <div className="grid grid-cols-1 gap-6 desktop:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] desktop:items-start desktop:gap-8">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={`${date}:${plan.status === 'ready' ? 'ready' : plan.status}`}
+            variants={fade}
+            initial="hidden"
+            animate="show"
+            exit="exit"
+            className="flex min-w-0 flex-col gap-6"
+          >
+            <PlanContent part="main" plan={plan} date={date} now={now} events={events} />
+          </motion.div>
+        </AnimatePresence>
 
-      <Card>
-        <WalkSpeedControl />
-      </Card>
+        <div className="flex min-w-0 flex-col gap-6">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={`${date}:${plan.status === 'ready' ? 'ready' : plan.status}`}
+              variants={fade}
+              initial="hidden"
+              animate="show"
+              exit="exit"
+              className="flex flex-col gap-6 empty:hidden"
+            >
+              <PlanContent part="side" plan={plan} date={date} now={now} events={events} />
+            </motion.div>
+          </AnimatePresence>
+          <Card>
+            <WalkSpeedControl />
+          </Card>
+        </div>
+      </div>
     </Page>
   );
 }
 
 interface PlanContentProps {
+  /** `main`: the trip to school, or the day's status. `side`: every other trip. */
+  part: 'main' | 'side';
   plan: DailyPlan;
   date: ISODate;
   now: Date;
   events: CalendarEvent[];
 }
 
-function PlanContent({ plan, date, now, events }: PlanContentProps) {
+function PlanContent({ part, plan, date, now, events }: PlanContentProps) {
   const home = useSettingsStore((s) => s.home);
   const school = useSettingsStore((s) => s.school);
   const schoolName = useSettingsStore((s) => s.schoolName);
+
+  if (part === 'side' && plan.status !== 'ready') return null;
 
   switch (plan.status) {
     case 'loading':
@@ -173,6 +195,7 @@ function PlanContent({ plan, date, now, events }: PlanContentProps) {
   return (
     <>
       {trips.map((trip, index) => {
+        if ((trip.purpose === 'to_school') !== (part === 'main')) return null;
         const title = eventTitle(trip);
         const heading =
           trip.purpose === 'to_school'

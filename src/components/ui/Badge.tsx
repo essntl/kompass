@@ -51,7 +51,7 @@ export function DemoBadge({ className }: DemoBadgeProps) {
     <Badge
       tone="accent"
       icon={<FlaskConical />}
-      title="Dette er et eksempelsvar. Appen kjører uten AI-nøkkel."
+      title="Dette er et eksempelsvar. Appen kjører uten API-nøkkel."
       className={className}
     >
       Demomodus

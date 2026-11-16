@@ -1,6 +1,6 @@
 # Kompass
 
-A prototype student app for Norwegian upper-secondary vocational students (yrkesfag, VG1–VG2).
+A prototype student app for Norwegian upper-secondary vocational students (yrkesfag, Vg1–Vg2).
 It brings the timetable, the trip to school, absence, a competence portfolio and the
 apprenticeship search into one place.
 
@@ -24,7 +24,7 @@ Then open http://localhost:5173. That one command starts both the web app (Vite,
 and the backend (Express, port 8787). On a phone on the same Wi-Fi, open
 `http://<your-computer's-IP>:5173`.
 
-The app starts with demo data: a student (Sara Nilsen, VG1 Teknologi- og industrifag), a
+The app starts with demo data: a student (Sara Nilsen, Vg1 Teknologi- og industrifag), a
 timetable around the current week, teachers with message history, portfolio entries and
 20 apprenticeship listings. Everything you change is saved in the browser and survives a
 reload. To start over, go to **Innstillinger → Tilbakestill demodata**.

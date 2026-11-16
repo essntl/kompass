@@ -95,7 +95,19 @@ export function detectionToAbsenceInput(
   const classes = events
     .filter((event) => event.kind === 'class' && wanted.has(event.id) && dayOf(event) >= today)
     .sort((a, b) => a.start.localeCompare(b.start));
-  if (classes.length === 0) return null;
+  if (classes.length === 0) {
+    // The student named a class that is not on the timetable that day ("norsktimen" on a
+    // day without Norsk). The absence itself is still real, so suggest the whole day.
+    if (dates.length === 0) return null;
+    return {
+      dates,
+      wholeDay: true,
+      classEventIds: [],
+      reason,
+      ...(text ? { text } : {}),
+      source: 'ai',
+    };
+  }
 
   return {
     dates: uniq(classes.map(dayOf)).sort(),

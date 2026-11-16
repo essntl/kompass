@@ -68,7 +68,7 @@ const LISTINGS: SeedListing[] = [
       'Du forstår og snakker norsk godt',
     ],
     offers: [
-      'Egen fadder gjennom hele læretida',
+      'Egen fadder gjennom hele læretiden',
       'Arbeidstøy og verneutstyr',
       'Lønn etter tariff',
       'Gode muligheter for fast jobb etter fagprøven',
@@ -93,7 +93,7 @@ const LISTINGS: SeedListing[] = [
     summary:
       'Sveiseverksted som bygger stålkonstruksjoner, trapper og rekkverk. Du får sveise mye, helt fra første uke.',
     description:
-      'Vi er 12 ansatte og lager stålkonstruksjoner til bygg og industri. Det meste sveiser vi i verkstedet, men du blir også med ut på montasje.\n\nHos oss får du prøve MAG, TIG og elektrode på ulike materialer og tykkelser. Målet er at du tar sveisesertifikat underveis i læretida.',
+      'Vi er 12 ansatte og lager stålkonstruksjoner til bygg og industri. Det meste sveiser vi i verkstedet, men du blir også med ut på montasje.\n\nHos oss får du prøve MAG, TIG og elektrode på ulike materialer og tykkelser. Målet er at du tar sveisesertifikat underveis i læretiden.',
     tasks: [
       'Sveise konstruksjoner i stål, rustfritt og aluminium',
       'Kappe, slipe og klargjøre materialer',
@@ -132,7 +132,7 @@ const LISTINGS: SeedListing[] = [
     summary:
       'Frittstående verksted på Grorud med mye elbil. Vi ser etter en lærling som liker feilsøking like godt som skruing.',
     description:
-      'Rullebakken er et verksted med seks mekanikere. Vi tar service, EU-kontroll og reparasjoner på alle merker, og over halvparten av bilene vi får inn er elektriske.\n\nDu jobber sammen med en fast mekaniker og får prøve deg på stadig større jobber. Vi setter av tid til opplæring hver uke, og du får kurs i høyvoltsikkerhet tidlig i læretida.',
+      'Rullebakken er et verksted med seks mekanikere. Vi tar service, EU-kontroll og reparasjoner på alle merker, og over halvparten av bilene vi får inn er elektriske.\n\nDu jobber sammen med en fast mekaniker og får prøve deg på stadig større jobber. Vi setter av tid til opplæring hver uke, og du får kurs i høyvoltsikkerhet tidlig i læretiden.',
     tasks: [
       'Service og vedlikehold etter produsentens program',
       'Feilsøking med diagnoseverktøy',
@@ -172,7 +172,7 @@ const LISTINGS: SeedListing[] = [
     summary:
       'Installasjonsbedrift med oppdrag i hele Oslo. Vi tar inn tre lærlinger til høsten.',
     description:
-      'Vi er 40 montører og lærlinger som jobber med rehabilitering, nybygg og service. Lærlingene våre bytter mellom avdelingene, slik at du får prøve alt fra sikringsskap til smarthus og ladeanlegg.\n\nLæretida er 4,5 år. Du følger en fast montør det første året og får gradvis mer ansvar.',
+      'Vi er 40 montører og lærlinger som jobber med rehabilitering, nybygg og service. Lærlingene våre bytter mellom avdelingene, slik at du får prøve alt fra sikringsskap til smarthus og ladeanlegg.\n\nHele utdanningen til elektriker tar 4,5 år. Etter to år på skolen er læretiden hos oss 2,5 år. Du følger en fast montør det første året og får gradvis mer ansvar.',
     tasks: [
       'Legge rør og trekke kabel',
       'Montere sikringsskap, brytere og stikkontakter',
@@ -348,7 +348,7 @@ const LISTINGS: SeedListing[] = [
       'Truckførerbevis betalt av bedriften',
       'Lønn etter tariff med skifttillegg',
       'Kantine og buss fra Vestby stasjon',
-      'Gode muligheter for jobb etter læretida',
+      'Gode muligheter for jobb etter læretiden',
     ],
     contactName: 'Hanne Kvam',
     contactRole: 'Terminalleder',
@@ -449,7 +449,7 @@ const LISTINGS: SeedListing[] = [
     summary:
       'Vi prefabrikkerer og monterer rørsystemer for prosessindustri og havbruk. To læreplasser i verkstedet på Forus.',
     description:
-      'Rørkraft bygger rørsystemer i karbonstål, rustfritt og titan. Du lærer å lese isometriske tegninger, kappe og tilpasse rør og gjøre klart for sveis.\n\nDet meste av læretida er i verkstedet. Etter fylte 18 år kan du også bli med på oppdrag hos kunder.',
+      'Rørkraft bygger rørsystemer i karbonstål, rustfritt og titan. Du lærer å lese isometriske tegninger, kappe og tilpasse rør og gjøre klart for sveis.\n\nDet meste av læretiden er i verkstedet. Etter fylte 18 år kan du også bli med på oppdrag hos kunder.',
     tasks: [
       'Lese isometriske tegninger og lage kappelister',
       'Kappe, bøye og tilpasse rør',
@@ -500,7 +500,7 @@ const LISTINGS: SeedListing[] = [
       'Fullført Vg2 arbeidsmaskiner innen oppstart',
       'Du er ikke redd for å bli skitten på hendene',
       'Selvstendig og lærevillig',
-      'Førerkort klasse B i løpet av læretida',
+      'Førerkort klasse B i løpet av læretiden',
     ],
     offers: [
       'Opplæring på maskiner fra flere produsenter',

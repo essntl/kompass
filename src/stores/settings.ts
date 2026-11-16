@@ -55,8 +55,14 @@ export interface SettingsState {
   reset: () => void;
 }
 
+/** "VG1" / "vg1" → "Vg1", the official spelling. Anything else is left as typed. */
+export function normaliseYear(year: string): string {
+  const match = /^\s*vg\s*([1-3])\s*$/i.exec(year);
+  return match ? `Vg${match[1]}` : year;
+}
+
 const defaults = {
-  profile: { name: 'Sara Nilsen', year: 'VG1', programme: 'Teknologi- og industrifag' },
+  profile: { name: 'Sara Nilsen', year: 'Vg1', programme: 'Teknologi- og industrifag' },
   schoolName: SEED_SCHOOL_NAME,
   school: SEED_SCHOOL,
   home: SEED_HOME,
@@ -98,6 +104,17 @@ export const useSettingsStore = create<SettingsState>()(
       reset: () => set({ ...defaults }),
     }),
     // The inline script in index.html reads `state.theme` from this key.
-    { name: 'kompass:settings', version: 1 },
+    {
+      name: 'kompass:settings',
+      version: 2,
+      // v1 stored the school year as "VG1"; the official spelling is "Vg1".
+      migrate: (persisted, version) => {
+        const state = persisted as Partial<SettingsState> | undefined;
+        if (version < 2 && state?.profile) {
+          state.profile = { ...state.profile, year: normaliseYear(state.profile.year) };
+        }
+        return state as SettingsState;
+      },
+    },
   ),
 );

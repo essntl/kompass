@@ -11,7 +11,7 @@ export function AiStatusRow() {
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex min-h-9 flex-wrap items-center justify-between gap-2">
-          <span className="text-body font-medium text-ink">AI-hjelp</span>
+          <span className="text-body font-medium text-ink">KI-hjelp</span>
           {status === 'live' ? (
             <Badge tone="success" icon={<CircleCheck />}>
               Tilkoblet
@@ -28,8 +28,8 @@ export function AiStatusRow() {
         </div>
         <p className="text-small text-ink-2">
           {status === 'live'
-            ? 'Svarene kommer fra en ekte AI-modell.'
-            : 'Uten API-nøkkel på serveren bruker appen ferdige eksempelsvar, så alt kan prøves uten AI.'}
+            ? 'Svarene kommer fra en ekte KI-modell.'
+            : 'Uten API-nøkkel på serveren bruker appen ferdige eksempelsvar, så alt kan prøves uten KI.'}
         </p>
       </div>
     </div>

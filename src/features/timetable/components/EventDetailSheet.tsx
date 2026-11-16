@@ -27,6 +27,7 @@ import { isAbsentFrom } from '@/lib/timetable';
 import { useMessagesStore } from '@/stores/messages';
 import { useSettingsStore } from '@/stores/settings';
 import { useTimetableStore } from '@/stores/timetable';
+import { upperFirst } from '../logic/labels';
 import { absenceHref, isEditable, KIND_LABEL } from '../logic/layout';
 
 export interface EventDetailSheetProps {
@@ -133,7 +134,7 @@ export function EventDetailSheet({ event, events, subject, onOpenChange, onEdit 
         open={event !== null}
         onOpenChange={onOpenChange}
         title={title}
-        description={<span className="capitalize">{formatDayLong(current.start)}</span>}
+        description={upperFirst(formatDayLong(current.start))}
         footer={footer}
       >
         <div className="flex flex-wrap gap-2">

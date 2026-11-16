@@ -1,6 +1,6 @@
 import { Send, Square } from 'lucide-react';
 import { useId, useState, type KeyboardEvent, type Ref } from 'react';
-import { Button, Textarea } from '@/components/ui';
+import { Button, Textarea, useMediaQuery } from '@/components/ui';
 import { MAX_QUESTION_LENGTH } from '../logic/conversation';
 
 export interface QuestionComposerProps {
@@ -13,10 +13,15 @@ export interface QuestionComposerProps {
   inputRef?: Ref<HTMLTextAreaElement>;
 }
 
+/** Hardware keyboard and a real pointer: Enter sends, Shift+Enter makes a new line. */
+const FINE_POINTER = '(hover: hover) and (pointer: fine)';
+
 /** The question field with its send button, which turns into "Stopp" while an answer streams. */
 export function QuestionComposer({ busy, onAsk, onStop, label, inputRef }: QuestionComposerProps) {
   const [value, setValue] = useState('');
   const hintId = useId();
+  // On touch screens Enter makes a new line and the button sends, so no keyboard hint.
+  const enterSends = useMediaQuery(FINE_POINTER);
 
   function submit() {
     if (busy) return;
@@ -25,7 +30,7 @@ export function QuestionComposer({ busy, onAsk, onStop, label, inputRef }: Quest
 
   function onKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     // Enter sends, Shift+Enter makes a new line. Never while an IME is composing.
-    if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
+    if (enterSends && event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
       event.preventDefault();
       submit();
     }
@@ -46,16 +51,20 @@ export function QuestionComposer({ busy, onAsk, onStop, label, inputRef }: Quest
         autoGrow
         maxLength={MAX_QUESTION_LENGTH}
         placeholder="Spør om lærlingplass, fagbrev, rettigheter …"
-        enterKeyHint="send"
+        enterKeyHint={enterSends ? 'send' : 'enter'}
         value={value}
         onChange={(event) => setValue(event.target.value)}
         onKeyDown={onKeyDown}
-        aria-describedby={hintId}
+        aria-describedby={enterSends ? hintId : undefined}
       />
       <div className="flex items-center justify-between gap-3">
-        <p id={hintId} className="min-w-0 text-caption text-ink-3 max-desktop:sr-only">
-          Enter sender, Shift+Enter gir ny linje.
-        </p>
+        {enterSends ? (
+          <p id={hintId} className="min-w-0 text-caption text-ink-3">
+            Enter sender, Shift+Enter gir ny linje.
+          </p>
+        ) : (
+          <span />
+        )}
         {busy ? (
           <Button type="button" variant="secondary" icon={<Square />} onClick={onStop}>
             Stopp

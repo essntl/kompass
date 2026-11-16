@@ -14,7 +14,7 @@ import {
 } from '@/lib/date';
 import { useSubjectMap } from '@/stores/timetable';
 import { useMessagesStore } from '@/stores/messages';
-import { classProgress, type NextClassState } from '../logic/schedule';
+import { classProgress, noteWithoutTeacher, type NextClassState } from '../logic/schedule';
 
 export interface NextClassCardProps {
   state: NextClassState;
@@ -149,6 +149,8 @@ function SubjectPill({ event, subject }: { event: CalendarEvent; subject: Subjec
 function ClassDetails({ event, teachers }: { event: CalendarEvent; teachers: Teacher[] }) {
   const teacher = event.teacherId ? teachers.find((t) => t.id === event.teacherId) : undefined;
   const meta = [event.room, teacher?.name].filter(Boolean).join(' · ');
+  // Imported notes often repeat the teacher ("Lærer: …"); the line above already names them.
+  const note = noteWithoutTeacher(event.note, teacher?.name);
   return (
     <div className="mt-3 flex flex-col gap-1.5 text-small">
       <p className="opacity-90">
@@ -166,10 +168,10 @@ function ClassDetails({ event, teachers }: { event: CalendarEvent; teachers: Tea
           </span>
         </p>
       ) : null}
-      {event.note ? (
+      {note ? (
         <p className="flex items-start gap-1.5 opacity-90">
           <StickyNote aria-hidden className="mt-0.5 size-4 shrink-0" />
-          <span>{event.note}</span>
+          <span className="whitespace-pre-line">{note}</span>
         </p>
       ) : null}
     </div>

@@ -142,8 +142,8 @@ RRULE:FREQ=WEEKLY;BYDAY=TH
 EXDATE;TZID=Europe/Oslo:20261224T103000
 EXDATE;TZID=Europe/Oslo:20261231T103000
 SUMMARY:YFF4106 Yrkesfaglig fordypning 1TIA
-LOCATION:Tellverk Mekaniske
-DESCRIPTION:Lærer: Morten Aasen
+LOCATION:Dronning Margretes vei 15\, Oslo
+DESCRIPTION:Utplassering hos Tellverk Mekaniske. Lærer: Morten Aasen
 END:VEVENT
 BEGIN:VEVENT
 UID:kompass-eksempel-11@kompass.example

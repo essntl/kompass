@@ -1,4 +1,13 @@
-import { CalendarCheck, ChevronDown, Download, FileUp, RotateCw, TriangleExclamationPoint } from 'lucide-react';
+import type { Place } from '@shared/types';
+import {
+  CalendarCheck,
+  ChevronDown,
+  Download,
+  FileUp,
+  MapPin,
+  RotateCw,
+  TriangleExclamationPoint,
+} from 'lucide-react';
 import { useId, useRef, useState, type DragEvent } from 'react';
 import {
   Badge,
@@ -11,10 +20,19 @@ import {
   toast,
   useIsDesktop,
 } from '@/components/ui';
+import { geocode } from '@/lib/api';
 import { formatDate, formatDayShort, formatTimeRange } from '@/lib/date';
 import { useMessagesStore } from '@/stores/messages';
+import { useSettingsStore } from '@/stores/settings';
 import { useTimetableStore } from '@/stores/timetable';
-import { IcsParseError, parseIcs, type IcsParseResult } from '../logic/parseIcs';
+import { upperFirst } from '../logic/labels';
+import {
+  addressQuery,
+  confidentMatch,
+  distinctAddressLocations,
+  offsiteSummary,
+} from '../logic/offsiteLocation';
+import { IcsParseError, parseIcs, type IcsEvent, type IcsParseResult } from '../logic/parseIcs';
 
 export interface ImportSheetProps {
   open: boolean;
@@ -24,6 +42,37 @@ export interface ImportSheetProps {
 export const SAMPLE_ICS_URL = '/sample/eksempel-timeplan.ics';
 const MAX_BYTES = 5 * 1024 * 1024;
 const PREVIEW_ROWS = 5;
+/** A geocoder that has not answered by then is skipped; the lesson stays at school. */
+const GEOCODE_TIMEOUT_MS = 6000;
+
+/**
+ * Looks up each distinct LOCATION that reads like a street address (work placement)
+ * once. Returns only confident matches, keyed by the LOCATION text. Never throws.
+ */
+async function locateOffsite(
+  events: IcsEvent[],
+  near: Place | null,
+): Promise<Map<string, Place>> {
+  const found = new Map<string, Place>();
+  const locations = distinctAddressLocations(events.map((event) => event.room));
+  await Promise.all(
+    locations.map(async (location) => {
+      const address = addressQuery(location);
+      if (!address) return;
+      try {
+        const response = await geocode(address.query, {
+          ...(near ? { lat: near.lat, lon: near.lon } : {}),
+          signal: AbortSignal.timeout(GEOCODE_TIMEOUT_MS),
+        });
+        const place = confidentMatch(location, address, response.features);
+        if (place) found.set(location, place);
+      } catch {
+        // Offline, timeout, Entur down: import the lesson without a place.
+      }
+    }),
+  );
+  return found;
+}
 
 /** Loads the seed timetable around the current week and says so. */
 export function useLoadSampleTimetable() {
@@ -50,6 +99,7 @@ export function ImportSheet({ open, onOpenChange }: ImportSheetProps) {
   const ensureSubject = useTimetableStore((s) => s.ensureSubject);
   const removeEvent = useTimetableStore((s) => s.removeEvent);
   const teachers = useMessagesStore((s) => s.teachers);
+  const school = useSettingsStore((s) => s.school);
   const loadSample = useLoadSampleTimetable();
 
   const [result, setResult] = useState<IcsParseResult | null>(null);
@@ -58,6 +108,9 @@ export function ImportSheet({ open, onOpenChange }: ImportSheetProps) {
   const [reading, setReading] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [showSkipped, setShowSkipped] = useState(false);
+  /** Lessons away from school, by LOCATION text; null while looking them up. */
+  const [offsite, setOffsite] = useState<Map<string, Place> | null>(new Map());
+  const lookup = useRef(0);
   const hasImported = events.some((e) => e.source === 'ics');
   const seedClasses = events.filter((e) => e.kind === 'class' && e.source === 'seed');
   const [replace, setReplace] = useState(true);
@@ -68,6 +121,8 @@ export function ImportSheet({ open, onOpenChange }: ImportSheetProps) {
     setFileName('');
     setError(null);
     setShowSkipped(false);
+    setOffsite(new Map());
+    lookup.current += 1;
     if (inputRef.current) inputRef.current.value = '';
   }
 
@@ -104,6 +159,11 @@ export function ImportSheet({ open, onOpenChange }: ImportSheetProps) {
       }
       setFileName(file.name);
       setResult(parsed);
+      const run = ++lookup.current;
+      setOffsite(null);
+      void locateOffsite(parsed.events, school).then((found) => {
+        if (lookup.current === run) setOffsite(found);
+      });
     } catch (caught) {
       setError(
         caught instanceof IcsParseError
@@ -118,9 +178,13 @@ export function ImportSheet({ open, onOpenChange }: ImportSheetProps) {
   function confirm() {
     if (!result) return;
     const mapped = result.events.map((event) => {
-      if (event.kind !== 'class') return event;
-      const subject = ensureSubject(event.title);
-      return { ...event, title: subject.name, subjectId: subject.id };
+      // An address in LOCATION becomes the lesson's place, so trips go there, not to school.
+      const place = event.room ? offsite?.get(event.room) : undefined;
+      const located: IcsEvent = place ? { ...event, location: place } : event;
+      if (place) delete located.room;
+      if (located.kind !== 'class') return located;
+      const subject = ensureSubject(located.title);
+      return { ...located, title: subject.name, subjectId: subject.id };
     });
     if (removeSample) seedClasses.forEach((e) => removeEvent(e.id));
     const count = importEvents(mapped, { replace });
@@ -139,13 +203,14 @@ export function ImportSheet({ open, onOpenChange }: ImportSheetProps) {
   const classCount = result?.events.filter((e) => e.kind === 'class').length ?? 0;
   const first = result?.events[0];
   const last = result?.events.at(-1);
+  const offsiteLabels = offsite ? [...offsite.values()].map((place) => place.label) : [];
 
   const footer = result ? (
     <div className="flex gap-2">
       <Button variant="secondary" fullWidth onClick={reset}>
         Velg en annen fil
       </Button>
-      <Button fullWidth icon={<CalendarCheck />} onClick={confirm}>
+      <Button fullWidth icon={<CalendarCheck />} loading={offsite === null} onClick={confirm}>
         Importer {result.events.length}
       </Button>
     </div>
@@ -174,13 +239,25 @@ export function ImportSheet({ open, onOpenChange }: ImportSheetProps) {
             {result.calendarName ? <p className="mt-1 text-small">{result.calendarName}</p> : null}
           </Card>
 
+          {offsite === null ? (
+            <p className="flex items-center gap-2 text-small text-ink-2">
+              <MapPin aria-hidden className="size-4 shrink-0" />
+              Ser etter steder utenfor skolen …
+            </p>
+          ) : offsiteLabels.length > 0 ? (
+            <p className="flex items-start gap-2 text-small text-ink">
+              <MapPin aria-hidden className="mt-0.5 size-4 shrink-0 text-ink-2" />
+              <span>{offsiteSummary(offsiteLabels)}</span>
+            </p>
+          ) : null}
+
           <div>
             <h3 className="mb-2 text-small font-semibold text-ink">De første</h3>
             <ul className="divide-y divide-line rounded-lg border border-line">
               {result.events.slice(0, PREVIEW_ROWS).map((event, index) => (
                 <li key={index} className="flex items-center gap-3 px-3 py-2.5">
-                  <span className="w-24 shrink-0 text-small text-ink-2 capitalize nums">
-                    {formatDayShort(event.start)}
+                  <span className="w-24 shrink-0 text-small text-ink-2 nums">
+                    {upperFirst(formatDayShort(event.start))}
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-semibold">{event.title}</span>

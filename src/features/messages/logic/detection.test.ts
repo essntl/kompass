@@ -101,13 +101,19 @@ describe('detectionToAbsenceInput', () => {
     });
   });
 
-  it('returns null when none of the classes exist', () => {
+  it('falls back to the whole day when none of the named classes exist that day', () => {
     expect(
       detectionToAbsenceInput(
         response({ dates: ['2026-11-17'], classEventIds: ['nope'] }),
         EVENTS,
         TODAY,
       ),
+    ).toMatchObject({ dates: ['2026-11-17'], wholeDay: true, classEventIds: [], source: 'ai' });
+  });
+
+  it('returns null when there are neither classes nor dates', () => {
+    expect(
+      detectionToAbsenceInput(response({ dates: [], classEventIds: ['nope'] }), EVENTS, TODAY),
     ).toBeNull();
   });
 

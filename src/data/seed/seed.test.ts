@@ -190,6 +190,15 @@ describe('seed portfolio', () => {
     }
   });
 
+  it('puts every entry on a weekday, newest first, whatever day it is today', () => {
+    for (let offset = 0; offset < 7; offset += 1) {
+      const now = new Date(2026, 10, 16 + offset, 12, 0);
+      const dates = buildSeedPortfolio(now).map((e) => e.date);
+      for (const date of dates) expect([0, 6], date).not.toContain(new Date(`${date}T12:00`).getDay());
+      expect([...dates].sort().reverse()).toEqual(dates);
+    }
+  });
+
   it('gives every entry a finished competence description', () => {
     for (const entry of entries) {
       expect(entry.competence?.mock).toBe(false);

@@ -107,7 +107,7 @@ function ThreadRow({
             {typing ? 'Skriver …' : preview(summary)}
           </p>
           {unread ? (
-            <span className="grid h-5 min-w-5 shrink-0 place-items-center rounded-full bg-accent px-1.5 text-caption font-bold text-accent-ink tabular-nums">
+            <span className="relative grid h-5 min-w-5 shrink-0 place-items-center rounded-full bg-accent px-1.5 text-caption font-bold text-accent-ink tabular-nums">
               {unreadCount}
               <span className="sr-only">
                 {unreadCount === 1 ? ' ulest melding' : ' uleste meldinger'}

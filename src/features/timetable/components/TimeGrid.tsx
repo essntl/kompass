@@ -10,6 +10,7 @@ import {
   type HourRange,
 } from '../logic/layout';
 import { eventAppearance } from '../logic/appearance';
+import { upperFirst } from '../logic/labels';
 import { EventBlock, KindIcon } from './EventBlock';
 
 export interface TimeGridProps {
@@ -73,8 +74,8 @@ export function TimeGrid({
                   aria-current={isToday ? 'date' : undefined}
                   className="flex min-h-12 min-w-0 flex-col items-center justify-center rounded-sm transition-[scale,background-color] duration-150 ease-out hover:bg-surface-hover active:scale-[0.97]"
                 >
-                  <span className="text-caption font-semibold text-ink-2 capitalize">
-                    {formatWeekday(day).slice(0, 3)}
+                  <span className="text-caption font-semibold text-ink-2">
+                    {upperFirst(formatWeekday(day).slice(0, 3))}
                   </span>
                   <span
                     className={cn(

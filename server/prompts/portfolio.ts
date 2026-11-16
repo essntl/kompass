@@ -13,7 +13,7 @@ export const SKILLS_RANGE = { min: 3, max: 6 } as const;
 export const GOALS_RANGE = { min: 1, max: 3 } as const;
 
 export const portfolioOutputSchema = z.object({
-  summary: z.string().describe('1–2 setninger som oppsummerer hva oppføringen viser at eleven kan.'),
+  summary: z.string().describe('1–2 setninger i jeg-form som oppsummerer hva oppføringen viser at eleven kan.'),
   whatWasDone: z.string().describe('2–4 setninger i jeg-form om hva eleven gjorde, i enkelt språk.'),
   skills: z.array(z.string()).describe('3–6 korte ferdigheter, 1–4 ord hver, for eksempel "MAG-sveising".'),
   suggestedGoals: z
@@ -34,7 +34,7 @@ export function buildPortfolioSystemPrompt(): string {
 Slik skriver du:
 - Norsk bokmål, enkelt og konkret, slik eleven selv kunne sagt det. Bruk jeg-form i whatWasDone ("Jeg målte opp og kappet ...").
 - Bygg bare på det eleven har skrevet og det du faktisk ser på bildet. Finn ikke på verktøy, maskiner, mål, tall, karakterer eller resultater som ikke står der eller ikke synes. Er notatet tynt, skriver du kortere og mer generelt i stedet for å dikte.
-- summary: en eller to setninger om hva oppføringen viser at eleven kan.
+- summary: en eller to setninger i jeg-form om hva oppføringen viser at eleven kan ("Jeg kan ...", "Jeg viser at jeg ..."). Skriv aldri "eleven", "hen" eller "du" i summary.
 - whatWasDone: to til fire setninger om hva eleven gjorde, steg for steg når det passer.
 - skills: tre til seks korte ferdigheter, ett til fire ord hver. Mest faglige ferdigheter, og gjerne én om arbeidsmåte (for eksempel HMS, nøyaktighet eller samarbeid) når oppføringen gir grunnlag for det.
 

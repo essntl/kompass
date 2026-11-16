@@ -1,5 +1,5 @@
 import { CalendarPlus, Check, CircleCheck } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, motion, useIsPresent } from 'motion/react';
 import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import { Button, DemoBadge } from '@/components/ui';
@@ -63,10 +63,19 @@ export function SuggestionCard({
   );
 }
 
-/** Animates to its content's measured height: in from 0, between states, out to 0. */
+/** A little longer than `collapse.open`, in ms: by then the box must be at full size. */
+const SETTLE_MS = Math.round(collapse.open.duration * 1000) + 80;
+
+/**
+ * Animates to its content's measured height: in from 0, between states, out to 0.
+ * The resting state does not depend on animation frames having run (a hidden tab pauses
+ * them): shortly after each change the box is put at its natural size directly.
+ */
 function MeasuredBox({ children }: { children: ReactNode }) {
+  const outer = useRef<HTMLDivElement>(null);
   const inner = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState<number | 'auto'>('auto');
+  const isPresent = useIsPresent();
 
   useLayoutEffect(() => {
     const el = inner.current;
@@ -76,14 +85,28 @@ function MeasuredBox({ children }: { children: ReactNode }) {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (!isPresent) return;
+    const timer = window.setTimeout(() => {
+      const el = outer.current;
+      if (!el) return;
+      el.style.height = 'auto';
+      el.style.opacity = '1';
+    }, SETTLE_MS);
+    return () => window.clearTimeout(timer);
+  }, [height, isPresent]);
+
   return (
     <motion.div
+      ref={outer}
       initial={{ height: 0, opacity: 0 }}
       animate={{ height, opacity: 1, transition: collapse.open }}
       exit={{ height: 0, opacity: 0, transition: collapse.close }}
       // `clip` instead of `hidden` keeps the buttons' focus rings visible.
       style={{ overflow: 'clip' }}
-      className="flex w-full justify-end"
+      // A block, not a flex row: a stretched flex child would take the animated height
+      // as its own, so measuring it fed the box's current height back as its target.
+      className="w-full"
     >
       <div ref={inner} className="flex w-full justify-end pt-2">
         {children}

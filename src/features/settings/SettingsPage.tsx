@@ -7,9 +7,9 @@ import { ResetDemoRow } from './components/ResetDemoRow';
 import { SettingsGroup } from './components/SettingsGroup';
 
 const YEARS = [
-  { value: 'VG1', label: 'VG1' },
-  { value: 'VG2', label: 'VG2' },
-  { value: 'VG3', label: 'VG3' },
+  { value: 'Vg1', label: 'Vg1' },
+  { value: 'Vg2', label: 'Vg2' },
+  { value: 'Vg3', label: 'Vg3' },
 ];
 
 export function SettingsPage() {

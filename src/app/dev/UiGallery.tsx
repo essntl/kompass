@@ -387,7 +387,7 @@ function ChipsAndBadgesSection() {
       </Demo>
 
       <Demo label="Badge tone">
-        <Badge>VG1</Badge>
+        <Badge>Vg1</Badge>
         <Badge tone="primary">3 plasser</Badge>
         <Badge tone="accent" icon={<Clock />}>
           Frist om 3 dager

@@ -40,7 +40,7 @@ const entries: PortfolioEntry[] = [
 describe('buildApplicationTextRequest', () => {
   it('passes the competence summary and skills when present', () => {
     const request = buildApplicationTextRequest(
-      { name: 'Sara Nilsen', year: 'VG1', programme: 'Teknologi- og industrifag' },
+      { name: 'Sara Nilsen', year: 'Vg1', programme: 'Teknologi- og industrifag' },
       listing,
       entries,
     );

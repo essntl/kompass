@@ -19,7 +19,10 @@ const distDir = path.join(rootDir, 'dist');
 const app = createApp({ distDir: serveDist ? distDir : undefined });
 const port = getPort();
 
-const server = app.listen(port, () => {
+// Express 5 also calls this callback with the error when listening fails (port in use);
+// only a call without an error means the port is bound. The error is reported below.
+const server = app.listen(port, (error?: Error) => {
+  if (error) return;
   const ai =
     getAiMode() === 'live'
       ? `live (model ${getModel()})`

@@ -30,6 +30,7 @@ import { ApplyActions } from './components/ApplyActions';
 import { DeadlineBadge } from './components/DeadlineBadge';
 import { splitParagraphs } from './logic/application';
 import { formatPositions } from './logic/filters';
+import { placeLabel } from './logic/place';
 import { useApprenticeshipUi } from './store';
 
 export function ListingDetailPage() {
@@ -100,7 +101,7 @@ function ListingDetail({ listing }: { listing: Listing }) {
                 {listing.trade}
               </Fact>
               <Fact icon={<MapPin />} label="Sted">
-                {listing.location}, {listing.county}
+                {placeLabel(listing)}
               </Fact>
               <Fact icon={<CalendarClock />} label="Søknadsfrist">
                 <span className="flex flex-col items-start gap-1">

@@ -8,8 +8,27 @@ import {
   firstName,
   greetingFor,
   nextClassState,
+  noteWithoutTeacher,
   travelDayFor,
 } from './schedule';
+
+describe('noteWithoutTeacher', () => {
+  it('drops the teacher line the card already shows', () => {
+    expect(noteWithoutTeacher('Lærer: Amir Rahimi', 'Amir Rahimi')).toBe('');
+    expect(
+      noteWithoutTeacher('Utplassering hos Tellverk Mekaniske. Lærer: Morten Aasen', 'Morten Aasen'),
+    ).toBe('Utplassering hos Tellverk Mekaniske.');
+    expect(noteWithoutTeacher('Ta med kalkulator.\nLærer: Amir Rahimi.', 'Amir Rahimi')).toBe(
+      'Ta med kalkulator.',
+    );
+  });
+
+  it('keeps everything else', () => {
+    expect(noteWithoutTeacher('Lærer: Hilde Bakken', 'Amir Rahimi')).toBe('Lærer: Hilde Bakken');
+    expect(noteWithoutTeacher('Ta med vernesko.', undefined)).toBe('Ta med vernesko.');
+    expect(noteWithoutTeacher(undefined, 'Amir Rahimi')).toBe('');
+  });
+});
 
 // Seed week around Monday 16 November 2026: Mon 08:15, Tue 09:55, Wed 08:15, Thu 08:15, Fri 08:15.
 const classes = buildSeedClasses(new Date(2026, 10, 16, 7, 0));

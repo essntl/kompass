@@ -141,3 +141,24 @@ export function dayOverview(events: CalendarEvent[], now: Date): DayOverview | n
 export function dayIsOver(overview: DayOverview): boolean {
   return overview.classes.every((c) => c.status === 'done' || c.absent);
 }
+
+const escapeRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * The class note without a "Lærer: <name>" line or sentence when the card already names
+ * that teacher (imported timetables put the teacher in the description). Empty → ''.
+ */
+export function noteWithoutTeacher(note: string | undefined, teacherName: string | undefined): string {
+  if (!note) return '';
+  if (!teacherName) return note.trim();
+  const pattern = new RegExp(
+    `(?:^|\\s)lærer\\s*:\\s*${escapeRegExp(teacherName)}\\s*\\.?(?=\\s|$)`,
+    'giu',
+  );
+  return note
+    .replace(pattern, ' ')
+    .split('\n')
+    .map((line) => line.replace(/\s+/g, ' ').trim())
+    .filter(Boolean)
+    .join('\n');
+}

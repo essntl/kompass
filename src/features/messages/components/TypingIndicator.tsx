@@ -14,7 +14,7 @@ export function TypingIndicator({ teacherName }: { teacherName: string }) {
       exit={{ opacity: 0, transition: tween.fast }}
       className="mt-3 flex"
     >
-      <div className="flex h-10 items-center gap-1 rounded-lg rounded-bl-sm border border-line bg-surface px-4">
+      <div className="relative flex h-10 items-center gap-1 rounded-lg rounded-bl-sm border border-line bg-surface px-4">
         <span className="sr-only">{teacherName} skriver</span>
         {[0, 1, 2].map((i) => (
           <motion.span

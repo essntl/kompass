@@ -34,7 +34,7 @@ const SUBJECTS: Subject[] = [
   { id: 'subj-norsk', name: 'Norsk', short: 'Norsk', color: 3, vocational: false },
 ];
 
-const PROFILE: StudentProfile = { name: 'Sara Nilsen', year: 'VG1', programme: 'Teknologi- og industrifag' };
+const PROFILE: StudentProfile = { name: 'Sara Nilsen', year: 'Vg1', programme: 'Teknologi- og industrifag' };
 
 describe('filterEntries / filterSubjects', () => {
   const entries = [entry('a', '2026-11-10', 'subj-pt'), entry('b', '2026-10-02', 'subj-kst'), entry('c', '2026-10-01')];
@@ -126,7 +126,7 @@ describe('request builders', () => {
       note: 'Bøyde plate',
       subject: 'Produksjon og tjenester',
       programme: 'Teknologi- og industrifag',
-      year: 'VG1',
+      year: 'Vg1',
       image,
     });
     const bare = buildDescribeRequest({ title: 'Boks', note: 'x' }, PROFILE, undefined, null);
@@ -148,7 +148,7 @@ describe('request builders', () => {
     const plain = entry('b', '2026-11-01');
     const request = buildApplicationRequest(PROFILE, pickEntries([plain, described], ['a', 'b', 'missing']));
     expect(request.listing).toBeUndefined();
-    expect(request.student).toEqual({ name: 'Sara Nilsen', year: 'VG1', programme: 'Teknologi- og industrifag' });
+    expect(request.student).toEqual({ name: 'Sara Nilsen', year: 'Vg1', programme: 'Teknologi- og industrifag' });
     expect(request.entries).toEqual([
       { title: 'Oppføring a', note: 'Et notat om arbeidet.', date: '2026-11-10', summary: 'Jeg har sveiset.', skills: ['MAG-sveising'] },
       { title: 'Oppføring b', note: 'Et notat om arbeidet.', date: '2026-11-01' },

@@ -105,7 +105,7 @@ export function ChatView({ threadId, variant, onReportAbsence }: ChatViewProps) 
   const Heading = variant === 'page' ? 'h1' : 'h2';
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="relative flex min-h-0 flex-1 flex-col">
       <header
         className={cn(
           'flex shrink-0 items-center gap-3',
@@ -133,8 +133,10 @@ export function ChatView({ threadId, variant, onReportAbsence }: ChatViewProps) 
         onScroll={onScroll}
         tabIndex={0}
         aria-label={`Samtale med ${teacherName}`}
+        // `relative`: the containing block for anything absolutely positioned inside the
+        // chat (sr-only labels), so nothing escapes the scroller and scrolls the page.
         className={cn(
-          'scroll-area min-h-0 flex-1 outline-offset-[-2px]',
+          'scroll-area relative min-h-0 flex-1 outline-offset-[-2px]',
           variant === 'page' ? '-mx-(--gutter) px-(--gutter)' : 'px-4',
         )}
       >

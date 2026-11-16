@@ -1,4 +1,4 @@
-import { addDays } from 'date-fns';
+import { addDays, isWeekend } from 'date-fns';
 import type { CompetenceDescription, PortfolioEntry } from '@shared/types';
 import { toISODate } from '@/lib/date';
 import { SUBJECT_IDS } from './subjects';
@@ -127,7 +127,7 @@ const ENTRIES: SeedEntry[] = [
   },
   {
     id: 'pe-vice',
-    title: 'Filt stålkloss til mål',
+    title: 'Filing av stålkloss til mål',
     note: 'Første oppgave i verkstedet. Jeg sagde av en kloss i flattstål, spente den i skrustikka og filte den til 60 × 40 mm. Sjekket vinklene med vinkelhake. Det tok lengre tid enn jeg trodde å få flatene helt plane.',
     daysAgo: 54,
     subjectId: SUBJECT_IDS.pt,
@@ -156,10 +156,19 @@ const ENTRIES: SeedEntry[] = [
 /** Asset refs used by the seed entries (handy for preloading and tests). */
 export const SEED_PORTFOLIO_PHOTOS = ENTRIES.map((entry) => entry.photo);
 
-/** Five portfolio entries spread over the two months before `now`, newest first. */
+/** Workshop work happens on school days: a Saturday or Sunday moves back to the Friday. */
+function schoolDayOnOrBefore(date: Date): Date {
+  let day = date;
+  while (isWeekend(day)) day = addDays(day, -1);
+  return day;
+}
+
+/** Five portfolio entries spread over the two months before `now`, newest first, on weekdays. */
 export function buildSeedPortfolio(now: Date = new Date()): PortfolioEntry[] {
   return ENTRIES.map((entry) => {
-    const day = addDays(new Date(now.getFullYear(), now.getMonth(), now.getDate()), -entry.daysAgo);
+    const day = schoolDayOnOrBefore(
+      addDays(new Date(now.getFullYear(), now.getMonth(), now.getDate()), -entry.daysAgo),
+    );
     const createdAt = new Date(day.getFullYear(), day.getMonth(), day.getDate(), 15, 40).toISOString();
     return {
       id: entry.id,

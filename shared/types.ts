@@ -215,7 +215,7 @@ export interface QuickLink {
 
 export interface StudentProfile {
   name: string;
-  /** e.g. "VG1". */
+  /** e.g. "Vg1". */
   year: string;
   /** Education programme, e.g. "Teknologi- og industrifag". */
   programme: string;

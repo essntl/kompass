@@ -4,6 +4,7 @@ import { Badge, Button, cn, EmptyState, Stagger, StaggerItem } from '@/component
 import { addDaysISO, formatDayLong, formatTimeRange, relativeDay, toISODate } from '@/lib/date';
 import { isAbsentFrom } from '@/lib/timetable';
 import { eventAppearance } from '../logic/appearance';
+import { upperFirst } from '../logic/labels';
 import { agendaDays, eventAriaLabel, KIND_LABEL } from '../logic/layout';
 import { KindIcon } from './EventBlock';
 
@@ -46,7 +47,7 @@ export function ListView({ from, events, subjects, now, onOpenEvent, onAdd }: Li
         return (
           <StaggerItem key={day} as="li">
             <h2 className="mb-2 flex items-baseline gap-2 text-small font-semibold text-ink-2">
-              <span className={cn('capitalize', day === today && 'text-ink')}>{formatDayLong(day)}</span>
+              <span className={cn(day === today && 'text-ink')}>{upperFirst(formatDayLong(day))}</span>
               {isNear ? <span className="font-normal">· {relative}</span> : null}
             </h2>
             <ul className="flex flex-col divide-y divide-line overflow-hidden rounded-lg border border-line bg-surface">
@@ -68,9 +69,10 @@ export function ListView({ from, events, subjects, now, onOpenEvent, onAdd }: Li
                         {event.allDay ? 'Hele dagen' : formatTimeRange(event.start, event.end)}
                       </span>
                       <span className={cn('min-w-0 flex-1', absent && 'opacity-70')}>
-                        <span className="flex min-w-0 items-center gap-1.5 font-semibold text-ink">
-                          <KindIcon kind={event.kind} className="size-4 text-ink-2" />
-                          <span className={cn('truncate', absent && 'line-through')}>{subject?.name ?? event.title}</span>
+                        <span className="flex min-w-0 items-start gap-1.5 font-semibold text-ink">
+                          <KindIcon kind={event.kind} className="mt-1 size-4 shrink-0 text-ink-2" />
+                          {/* Two lines before clipping: long subject names ("Yrkesfaglig fordypning") stay readable. */}
+                          <span className={cn('line-clamp-2 min-w-0 break-words', absent && 'line-through')}>{subject?.name ?? event.title}</span>
                         </span>
                         {place ? <span className="block truncate text-small text-ink-2">{place}</span> : null}
                       </span>

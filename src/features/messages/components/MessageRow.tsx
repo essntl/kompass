@@ -30,8 +30,10 @@ export function MessageRow({
       initial={{ opacity: 0, y: 8, x: own ? 12 : 0 }}
       animate={{ opacity: 1, y: 0, x: 0, transition: tween.base }}
       exit={{ opacity: 0, transition: tween.fast }}
+      // `relative` keeps the absolutely positioned sr-only label inside the row (and so
+      // inside the scroller) instead of letting it stretch the document.
       className={cn(
-        'flex flex-col',
+        'relative flex flex-col',
         own ? 'items-end' : 'items-start',
         firstInGroup ? 'mt-3' : 'mt-1',
       )}
