@@ -116,6 +116,24 @@ export const INFO_SOURCES: InfoSource[] = [
       'En samleside for deg som går eller vurderer yrkesfag, delt inn etter hvor du er i løpet: vurderer yrkesfag, går Vg1 eller Vg2, er lærling eller har fullført. Lenker videre til verktøy som viser hva du kan bli med ditt utdanningsprogram, og hvor du finner lærebedrifter.',
     topics: ['veier', 'laerling', 'soke'],
   },
+  {
+    id: 'utdanning-ikke-laereplass',
+    title: 'Hva skjer hvis jeg ikke får læreplass?',
+    url: 'https://utdanning.no/yrkesfag/gar-du-vg1-eller-vg2-yrkesfag/forbered-deg-pa-laeretiden/hva-hvis-du-ikke-far-laereplass',
+    publisher: 'Utdanning.no',
+    summary:
+      'Forklarer hva du har krav på hvis du har rett til videregående opplæring, men ikke får læreplass: et alternativt opplæringstilbud, ofte Vg3 i skole med praksis i bedrift. Du må ha registrert søknaden i Vigo innen fristen, og fylkeskommunen har ansvaret for opplæringen din.',
+    topics: ['veier', 'soke', 'rettigheter'],
+  },
+  {
+    id: 'utdanning-y-veien',
+    title: 'Y-veien',
+    url: 'https://utdanning.no/tema/yrkesfag_universitet_og_hogskole/y-veien',
+    publisher: 'Utdanning.no',
+    summary:
+      'Om Y-veien, som lar deg søke enkelte studier på universitet og høgskole med yrkesfag fra videregående, uten påbygging eller forkurs. Du må ha relevant yrkeskompetanse, og studiene er oftest innen ingeniørfag, realfag og maritime fag.',
+    topics: ['veier'],
+  },
 
   // ------------------------------------------------------------ Utdanningsdirektoratet
   {

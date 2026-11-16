@@ -120,7 +120,7 @@ export const PATH_NODES: PathNode[] = [
         'Får du læreplass etter at du har begynt, kan du bytte til vanlig læretid.',
         'Fylket ditt bestemmer hvordan tilbudet er lagt opp. Spør rådgiveren eller fagopplæringen i fylket.',
       ],
-      sourceIds: ['utdanning-yrkesfaghandboka', 'vilbli-soke-laereplass'],
+      sourceIds: ['utdanning-ikke-laereplass', 'vilbli-soke-laereplass'],
     },
   },
   {
@@ -190,7 +190,7 @@ export const PATH_NODES: PathNode[] = [
       what: 'En vei inn på enkelte studier på universitet og høgskole for deg med yrkesfag. Du trenger ikke påbygging, men du må ha yrkeskompetanse som passer studiet.',
       gives: 'En bachelorgrad, oftest innen ingeniørfag, realfag eller maritime fag.',
       notes: ['Noen studier krever også relevant praksis. Sjekk opptakskravene.'],
-      sourceIds: ['utdanning-yrkesfaghandboka'],
+      sourceIds: ['utdanning-y-veien'],
     },
   },
   {

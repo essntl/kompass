@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { INFO_SOURCES, INFO_TOPIC_IDS, infoSourcesForTopic } from './infoSources';
 
 describe('INFO_SOURCES', () => {
-  it('has 12–18 sources with unique ids and URLs', () => {
+  it('has 12–20 sources with unique ids and URLs', () => {
     expect(INFO_SOURCES.length).toBeGreaterThanOrEqual(12);
-    expect(INFO_SOURCES.length).toBeLessThanOrEqual(18);
+    expect(INFO_SOURCES.length).toBeLessThanOrEqual(20);
     expect(new Set(INFO_SOURCES.map((source) => source.id)).size).toBe(INFO_SOURCES.length);
     expect(new Set(INFO_SOURCES.map((source) => source.url)).size).toBe(INFO_SOURCES.length);
   });

@@ -82,7 +82,7 @@ export function LeaveCard({ day, now }: LeaveCardProps) {
 
       {plan.status === 'missing_address' ? null : (
         <div className="mt-2 -mb-1 -ml-3">
-          <ButtonLink to="/reise" variant="ghost" size="sm" iconRight={<ArrowRight />}>
+          <ButtonLink to={day.isToday ? '/reise' : `/reise?dag=${day.date}`} variant="ghost" size="sm" iconRight={<ArrowRight />}>
             Se hele reisen
           </ButtonLink>
         </div>

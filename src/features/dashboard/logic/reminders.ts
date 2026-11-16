@@ -72,7 +72,7 @@ function eventReminders({ events, now }: ReminderSources): Reminder[] {
       title: e.title,
       ...(e.room || e.location ? { detail: e.room ?? e.location?.label } : {}),
       due: e.start,
-      href: '/timeplan',
+      href: `/timeplan?dato=${e.start.slice(0, 10)}`,
     }));
 }
 

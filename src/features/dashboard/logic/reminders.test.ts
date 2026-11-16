@@ -110,7 +110,7 @@ describe('buildReminders', () => {
       }),
     );
     expect(reminders.map((r) => r.id)).toEqual(['event-soon']);
-    expect(reminders[0]).toMatchObject({ detail: 'Auditoriet', href: '/timeplan' });
+    expect(reminders[0]).toMatchObject({ detail: 'Auditoriet', href: '/timeplan?dato=2026-11-18' });
   });
 
   it('groups unread messages per teacher', () => {
