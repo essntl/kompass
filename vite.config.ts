@@ -19,6 +19,8 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
+    // Lets a temporary Cloudflare quick tunnel serve the dev app (for testing on a phone).
+    allowedHosts: ['.trycloudflare.com'],
     proxy: {
       // All backend calls (Anthropic proxy + Entur proxy) go through /api.
       '/api': { target: `http://localhost:${API_PORT}`, changeOrigin: true },
