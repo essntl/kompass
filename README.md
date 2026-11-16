@@ -42,7 +42,7 @@ reaches the browser.
 returns plausible answers, and the UI marks them with a small "Demomodus" badge.
 Innstillinger shows which mode is active.
 
-Optional settings in `.env`: `PORT` (backend port), `ANTHROPIC_MODEL`, `ENTUR_CLIENT_NAME`.
+Optional settings in `.env`: `API_PORT` (backend port, default 8787), `ANTHROPIC_MODEL`, `ENTUR_CLIENT_NAME`.
 
 ### Other commands
 

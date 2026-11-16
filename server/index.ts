@@ -38,7 +38,7 @@ const server = app.listen(port, () => {
 
 server.on('error', (err: NodeJS.ErrnoException) => {
   if (err.code === 'EADDRINUSE') {
-    console.error(`[api] Port ${port} is already in use. Stop the other process or set PORT.`);
+    console.error(`[api] Port ${port} is already in use. Stop the other process or set API_PORT in .env.`);
   } else {
     console.error('[api] Could not start the server:', err);
   }

@@ -1,9 +1,12 @@
 import { fileURLToPath, URL } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import { loadEnv } from 'vite';
 import { defineConfig } from 'vitest/config';
 
-const API_PORT = Number(process.env.PORT ?? 8787);
+// Read API_PORT from .env too, so the proxy always points at the port the backend uses.
+const env = loadEnv('development', process.cwd(), 'API_');
+const API_PORT = Number(process.env.API_PORT ?? env.API_PORT ?? 8787) || 8787;
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
