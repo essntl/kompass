@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-labelledby="t">
+  <title id="t">En åpen boks bøyd i tynn stålplate med popnagler i hjørnene. Ved siden av ligger tegningen av utfoldingen, en stållinjal og en blyant.</title>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#c5ddd6" stroke-width="1.5"/>
+    </pattern>
+    <pattern id="ticks" width="10" height="30" patternUnits="userSpaceOnUse">
+      <path d="M5 0V9" stroke="#37464f" stroke-width="1.500"/>
+    </pattern>
+    <pattern id="longticks" width="50" height="30" patternUnits="userSpaceOnUse">
+      <path d="M5 0V16" stroke="#37464f" stroke-width="2"/>
+    </pattern>
+    <clipPath id="opening">
+      <path d="M510 146 707.400 260 570.600 339 373.200 225Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- bench mat -->
+  <rect width="800" height="600" fill="#dcebe6"/>
+  <rect width="800" height="600" fill="url(#grid)"/>
+  <g fill="none" stroke="#0e5a50" stroke-width="1.5" opacity="0.45">
+    <path d="M756 32h24M768 20v24M756 568h24M768 556v24"/>
+  </g>
+
+  <!-- drawing of the flat pattern -->
+  <g transform="rotate(-7 190 400)">
+    <rect x="58" y="262" width="270" height="296" fill="#14201d" opacity="0.1"/>
+    <rect x="50" y="254" width="270" height="296" fill="#fdfdfb" stroke="#14201d" stroke-width="3"/>
+    <!-- outline of the unfolded box -->
+    <path d="M130 302H240V346H250L284 356V448L250 458H240V502H130V458H120L86 448V356L120 346H130Z" fill="#dcebe6" stroke="#0b4a42" stroke-width="2.500" stroke-linejoin="round"/>
+    <!-- fold lines -->
+    <g fill="none" stroke="#0e5a50" stroke-width="1.500" stroke-dasharray="7 5">
+      <path d="M130 346H240M130 458H240M130 346V458M240 346V458"/>
+      <path d="M120 346V458M250 346V458"/>
+    </g>
+    <!-- dimensions -->
+    <g fill="none" stroke="#0e5a50" stroke-width="1.200">
+      <path d="M130 282H240M130 274V296M240 274V296"/>
+      <path d="M300 346V458M292 346H308M292 458H308"/>
+    </g>
+    <path d="M130 282l9-3.500v7zM240 282l-9-3.500v7zM300 346l-3.500 9h7zM300 458l-3.500-9h7z" fill="#0e5a50"/>
+    <rect x="166" y="271" width="38" height="20" fill="#fdfdfb"/>
+    <text x="185" y="288" text-anchor="middle" font-family="Figtree, 'Segoe UI', system-ui, sans-serif" font-size="15" font-weight="600" fill="#0b4a42">240</text>
+    <rect x="288" y="390" width="26" height="22" fill="#fdfdfb"/>
+    <text x="301" y="407" text-anchor="middle" font-family="Figtree, 'Segoe UI', system-ui, sans-serif" font-size="15" font-weight="600" fill="#0b4a42">170</text>
+    <!-- title block -->
+    <path d="M196 518H312V542H196ZM254 518V542" fill="none" stroke="#0b4a42" stroke-width="1.500"/>
+    <path d="M204 530H244M262 530H302" stroke="#9aaeb9" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- pencil on the drawing -->
+  <g transform="translate(96 588) rotate(-38)">
+    <rect x="4" y="2" width="210" height="16" rx="6" fill="#14201d" opacity="0.1"/>
+    <rect x="0" y="-8" width="168" height="16" fill="#f2a20c" stroke="#14201d" stroke-width="2.500"/>
+    <path d="M0-2.500H168" stroke="#c97a06" stroke-width="2"/>
+    <rect x="-22" y="-8" width="22" height="16" rx="3" fill="#c8553d" stroke="#14201d" stroke-width="2.500"/>
+    <rect x="-6" y="-8" width="8" height="16" fill="#c3d1d9" stroke="#14201d" stroke-width="2"/>
+    <path d="M168-8 200 0 168 8Z" fill="#e6cf95" stroke="#14201d" stroke-width="2.500" stroke-linejoin="round"/>
+    <path d="M190-2.500 200 0 190 2.500Z" fill="#14201d"/>
+  </g>
+
+  <!-- steel rule -->
+  <g transform="translate(44 96) rotate(9)">
+    <rect x="8" y="8" width="330" height="30" fill="#14201d" opacity="0.1"/>
+    <rect x="0" y="0" width="330" height="30" rx="2" fill="#d3dde3" stroke="#14201d" stroke-width="2.500"/>
+    <rect x="6" y="1.500" width="318" height="16" fill="url(#ticks)"/>
+    <rect x="6" y="1.500" width="318" height="18" fill="url(#longticks)"/>
+    <circle cx="316" cy="21" r="3.500" fill="#dcebe6" stroke="#14201d" stroke-width="1.500"/>
+  </g>
+
+  <!-- loose pop rivets -->
+  <g stroke="#14201d" stroke-width="2" stroke-linecap="round">
+    <path d="M318 206l20-12" stroke-width="5"/>
+    <path d="M318 206l20-12" stroke="#c3d1d9" stroke-width="2"/>
+    <circle cx="316" cy="207" r="6" fill="#eef2f4"/>
+    <path d="M286 238l-6-22" stroke-width="5"/>
+    <path d="M286 238l-6-22" stroke="#c3d1d9" stroke-width="2"/>
+    <circle cx="286" cy="240" r="6" fill="#eef2f4"/>
+  </g>
+
+  <!-- shadow of the box -->
+  <path d="M362.800 320 570.600 440 717.800 355 772 386 624 472 400 342Z" fill="#14201d" opacity="0.13"/>
+
+  <!-- box: what you see through the opening -->
+  <path d="M362.800 225 510 140 717.800 260 717.800 355 570.600 440 362.800 320Z" fill="#b3c2cb"/>
+  <g clip-path="url(#opening)">
+    <path d="M510 241 707.400 355 570.600 434 373.200 320Z" fill="#a3b4be"/>
+    <path d="M510 146 707.400 260V355L510 241Z" fill="#cdd9df"/>
+    <path d="M510 146 373.200 225V320L510 241Z" fill="#8ea1ac"/>
+    <path d="M510 241 373.200 320 420 347 556 268Z" fill="#8497a2" opacity="0.6"/>
+    <g fill="none" stroke="#14201d" stroke-width="2.500" stroke-linejoin="round">
+      <path d="M510 146V241M510 241 707.400 355M510 241 373.200 320"/>
+    </g>
+  </g>
+
+  <!-- outer faces -->
+  <g stroke="#14201d" stroke-width="3" stroke-linejoin="round">
+    <path d="M362.800 225 570.600 345V440L362.800 320Z" fill="#d6e0e5"/>
+    <path d="M570.600 345 717.800 260V355L570.600 440Z" fill="#b3c2cb"/>
+  </g>
+  <!-- hems along the top edge -->
+  <path d="M366 238 570.600 356 715 273" fill="none" stroke="#8ea1ac" stroke-width="2"/>
+  <path d="M368 316 568 431" stroke="#eef2f4" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- corner tabs with pop rivets -->
+  <g stroke="#14201d" stroke-width="2.500" stroke-linejoin="round">
+    <path d="M570.600 357 596 342.500V415.500L570.600 430Z" fill="#c8d4da"/>
+    <path d="M717.800 271 692.400 285.500V358.500L717.800 344Z" fill="#c8d4da"/>
+    <path d="M362.800 236 388.200 250.500V323.500L362.800 309Z" fill="#e3eaee"/>
+  </g>
+  <g fill="#f7f9fa" stroke="#14201d" stroke-width="2">
+    <ellipse cx="583.300" cy="366" rx="4.500" ry="5"/><ellipse cx="583.300" cy="406" rx="4.500" ry="5"/>
+    <ellipse cx="705.100" cy="294" rx="4.500" ry="5"/><ellipse cx="705.100" cy="334" rx="4.500" ry="5"/>
+    <ellipse cx="375.500" cy="259" rx="4.500" ry="5"/><ellipse cx="375.500" cy="299" rx="4.500" ry="5"/>
+  </g>
+
+  <!-- top rim: the edge of the sheet -->
+  <path d="M362.800 225 510 140 717.800 260 570.600 345ZM373.200 225 570.600 339 707.400 260 510 146Z" fill="#f2f5f6" fill-rule="evenodd" stroke="#14201d" stroke-width="2.500" stroke-linejoin="round"/>
+
+  <!-- dimension along the long side -->
+  <g fill="none" stroke="#0e5a50" stroke-width="1.500">
+    <path d="M510 112 717.800 232M510 134V100M717.800 254V220"/>
+  </g>
+  <path d="M510 112l12 2.500-5 8.500zM717.800 232l-12-2.500 5-8.500z" fill="#0e5a50"/>
+  <g transform="translate(614 172) rotate(30)">
+    <rect x="-24" y="-13" width="48" height="24" fill="#dcebe6"/>
+    <text x="0" y="6" text-anchor="middle" font-family="Figtree, 'Segoe UI', system-ui, sans-serif" font-size="17" font-weight="600" fill="#0b4a42">240</text>
+  </g>
+</svg>

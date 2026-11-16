@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <title>Kompass</title>
+  <!-- Full-bleed ground; the drawing stays inside the central 80% safe zone. -->
+  <rect width="512" height="512" fill="#0e5a50"/>
+  <g transform="translate(256 256) scale(.74) translate(-256 -256)">
+    <circle cx="256" cy="256" r="156" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="22"/>
+    <g transform="rotate(38 256 256)">
+      <path d="M256 92 320 256H192Z" fill="#f2a20c"/>
+      <path d="M256 420 192 256h128Z" fill="#fff"/>
+    </g>
+    <circle cx="256" cy="256" r="24" fill="#0e5a50"/>
+  </g>
+</svg>

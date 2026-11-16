@@ -1,0 +1,429 @@
+{
+  "data": {
+    "trip": {
+      "tripPatterns": [
+        {
+          "aimedStartTime": "2026-11-17T07:28:18+01:00",
+          "expectedStartTime": "2026-11-17T07:28:18+01:00",
+          "aimedEndTime": "2026-11-17T07:54:28+01:00",
+          "expectedEndTime": "2026-11-17T07:54:28+01:00",
+          "duration": 1570,
+          "legs": [
+            {
+              "mode": "foot",
+              "aimedStartTime": "2026-11-17T07:28:18+01:00",
+              "expectedStartTime": "2026-11-17T07:28:18+01:00",
+              "aimedEndTime": "2026-11-17T07:29:00+01:00",
+              "expectedEndTime": "2026-11-17T07:29:00+01:00",
+              "realtime": false,
+              "distance": 49.01,
+              "duration": 42,
+              "fromPlace": {
+                "name": "Hjem",
+                "quay": null
+              },
+              "toPlace": {
+                "name": "Olaf Ryes plass",
+                "quay": {
+                  "publicCode": ""
+                }
+              },
+              "line": null,
+              "fromEstimatedCall": null,
+              "intermediateEstimatedCalls": [],
+              "situations": []
+            },
+            {
+              "mode": "tram",
+              "aimedStartTime": "2026-11-17T07:29:00+01:00",
+              "expectedStartTime": "2026-11-17T07:29:00+01:00",
+              "aimedEndTime": "2026-11-17T07:39:00+01:00",
+              "expectedEndTime": "2026-11-17T07:39:00+01:00",
+              "realtime": false,
+              "distance": 2869,
+              "duration": 600,
+              "fromPlace": {
+                "name": "Olaf Ryes plass",
+                "quay": {
+                  "publicCode": ""
+                }
+              },
+              "toPlace": {
+                "name": "Storo",
+                "quay": {
+                  "publicCode": "B"
+                }
+              },
+              "line": {
+                "publicCode": "15",
+                "name": "Jernbanetorget - Majorstuen via Nat",
+                "presentation": {
+                  "colour": "0B91EF",
+                  "textColour": "FFFFFF"
+                }
+              },
+              "fromEstimatedCall": {
+                "destinationDisplay": {
+                  "frontText": "Kjelsås"
+                }
+              },
+              "intermediateEstimatedCalls": [
+                {
+                  "quay": {
+                    "id": "NSR:Quay:11842"
+                  }
+                },
+                {
+                  "quay": {
+                    "id": "NSR:Quay:11867"
+                  }
+                },
+                {
+                  "quay": {
+                    "id": "NSR:Quay:11728"
+                  }
+                },
+                {
+                  "quay": {
+                    "id": "NSR:Quay:11752"
+                  }
+                },
+                {
+                  "quay": {
+                    "id": "NSR:Quay:11770"
+                  }
+                }
+              ],
+              "situations": []
+            },
+            {
+              "mode": "foot",
+              "aimedStartTime": "2026-11-17T07:39:00+01:00",
+              "expectedStartTime": "2026-11-17T07:39:00+01:00",
+              "aimedEndTime": "2026-11-17T07:41:30+01:00",
+              "expectedEndTime": "2026-11-17T07:41:30+01:00",
+              "realtime": false,
+              "distance": 132.47,
+              "duration": 150,
+              "fromPlace": {
+                "name": "Storo",
+                "quay": {
+                  "publicCode": "B"
+                }
+              },
+              "toPlace": {
+                "name": "Storo",
+                "quay": {
+                  "publicCode": "2"
+                }
+              },
+              "line": null,
+              "fromEstimatedCall": null,
+              "intermediateEstimatedCalls": [],
+              "situations": []
+            },
+            {
+              "mode": "metro",
+              "aimedStartTime": "2026-11-17T07:45:00+01:00",
+              "expectedStartTime": "2026-11-17T07:45:00+01:00",
+              "aimedEndTime": "2026-11-17T07:51:00+01:00",
+              "expectedEndTime": "2026-11-17T07:51:00+01:00",
+              "realtime": false,
+              "distance": 3190,
+              "duration": 360,
+              "fromPlace": {
+                "name": "Storo",
+                "quay": {
+                  "publicCode": "2"
+                }
+              },
+              "toPlace": {
+                "name": "Økern",
+                "quay": {
+                  "publicCode": "1"
+                }
+              },
+              "line": {
+                "publicCode": "4",
+                "name": "Vestli - Bergkrystallen",
+                "presentation": {
+                  "colour": "EC700C",
+                  "textColour": "FFFFFF"
+                }
+              },
+              "fromEstimatedCall": {
+                "destinationDisplay": {
+                  "frontText": "Vestli"
+                }
+              },
+              "intermediateEstimatedCalls": [
+                {
+                  "quay": {
+                    "id": "NSR:Quay:11078"
+                  }
+                },
+                {
+                  "quay": {
+                    "id": "NSR:Quay:102017"
+                  }
+                }
+              ],
+              "situations": [
+                {
+                  "summary": [
+                    {
+                      "value": "T-banen stenger 19.-22. november",
+                      "language": "no"
+                    },
+                    {
+                      "value": "The Metro will be closed from November 19.–22.",
+                      "language": "en"
+                    }
+                  ],
+                  "description": [
+                    {
+                      "value": "T-banen er stengt på nesten alle strekninger 19. - 22. november. Se ruter.no for mer informasjon.",
+                      "language": "no"
+                    },
+                    {
+                      "value": "The Metro is closed on almost all lines from November 19.–22. See ruter.no for more information.",
+                      "language": "en"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "mode": "foot",
+              "aimedStartTime": "2026-11-17T07:51:00+01:00",
+              "expectedStartTime": "2026-11-17T07:51:00+01:00",
+              "aimedEndTime": "2026-11-17T07:54:28+01:00",
+              "expectedEndTime": "2026-11-17T07:54:28+01:00",
+              "realtime": false,
+              "distance": 209.06,
+              "duration": 208,
+              "fromPlace": {
+                "name": "Økern",
+                "quay": {
+                  "publicCode": "1"
+                }
+              },
+              "toPlace": {
+                "name": "Kuben",
+                "quay": null
+              },
+              "line": null,
+              "fromEstimatedCall": null,
+              "intermediateEstimatedCalls": [],
+              "situations": []
+            }
+          ]
+        },
+        {
+          "aimedStartTime": "2026-11-17T07:24:18+01:00",
+          "expectedStartTime": "2026-11-17T07:24:18+01:00",
+          "aimedEndTime": "2026-11-17T07:51:45+01:00",
+          "expectedEndTime": "2026-11-17T07:51:45+01:00",
+          "duration": 1647,
+          "legs": [
+            {
+              "mode": "foot",
+              "aimedStartTime": "2026-11-17T07:24:18+01:00",
+              "expectedStartTime": "2026-11-17T07:24:18+01:00",
+              "aimedEndTime": "2026-11-17T07:25:00+01:00",
+              "expectedEndTime": "2026-11-17T07:25:00+01:00",
+              "realtime": false,
+              "distance": 49.01,
+              "duration": 42,
+              "fromPlace": {
+                "name": "Hjem",
+                "quay": null
+              },
+              "toPlace": {
+                "name": "Olaf Ryes plass",
+                "quay": {
+                  "publicCode": ""
+                }
+              },
+              "line": null,
+              "fromEstimatedCall": null,
+              "intermediateEstimatedCalls": [],
+              "situations": []
+            },
+            {
+              "mode": "tram",
+              "aimedStartTime": "2026-11-17T07:25:00+01:00",
+              "expectedStartTime": "2026-11-17T07:25:00+01:00",
+              "aimedEndTime": "2026-11-17T07:35:00+01:00",
+              "expectedEndTime": "2026-11-17T07:35:00+01:00",
+              "realtime": false,
+              "distance": 2869,
+              "duration": 600,
+              "fromPlace": {
+                "name": "Olaf Ryes plass",
+                "quay": {
+                  "publicCode": ""
+                }
+              },
+              "toPlace": {
+                "name": "Storo",
+                "quay": {
+                  "publicCode": "B"
+                }
+              },
+              "line": {
+                "publicCode": "12",
+                "name": "Kjelsås - Majorstuen o/ løkka og Aker Brygge",
+                "presentation": {
+                  "colour": "0B91EF",
+                  "textColour": "FFFFFF"
+                }
+              },
+              "fromEstimatedCall": {
+                "destinationDisplay": {
+                  "frontText": "Kjelsås"
+                }
+              },
+              "intermediateEstimatedCalls": [
+                {
+                  "quay": {
+                    "id": "NSR:Quay:11842"
+                  }
+                },
+                {
+                  "quay": {
+                    "id": "NSR:Quay:11867"
+                  }
+                },
+                {
+                  "quay": {
+                    "id": "NSR:Quay:11728"
+                  }
+                },
+                {
+                  "quay": {
+                    "id": "NSR:Quay:11752"
+                  }
+                },
+                {
+                  "quay": {
+                    "id": "NSR:Quay:11770"
+                  }
+                }
+              ],
+              "situations": []
+            },
+            {
+              "mode": "foot",
+              "aimedStartTime": "2026-11-17T07:35:00+01:00",
+              "expectedStartTime": "2026-11-17T07:35:00+01:00",
+              "aimedEndTime": "2026-11-17T07:36:31+01:00",
+              "expectedEndTime": "2026-11-17T07:36:31+01:00",
+              "realtime": false,
+              "distance": 73.1,
+              "duration": 91,
+              "fromPlace": {
+                "name": "Storo",
+                "quay": {
+                  "publicCode": "B"
+                }
+              },
+              "toPlace": {
+                "name": "Storo",
+                "quay": {
+                  "publicCode": "E"
+                }
+              },
+              "line": null,
+              "fromEstimatedCall": null,
+              "intermediateEstimatedCalls": [],
+              "situations": []
+            },
+            {
+              "mode": "bus",
+              "aimedStartTime": "2026-11-17T07:39:00+01:00",
+              "expectedStartTime": "2026-11-17T07:39:00+01:00",
+              "aimedEndTime": "2026-11-17T07:50:00+01:00",
+              "expectedEndTime": "2026-11-17T07:50:00+01:00",
+              "realtime": false,
+              "distance": 2638,
+              "duration": 660,
+              "fromPlace": {
+                "name": "Storo",
+                "quay": {
+                  "publicCode": "E"
+                }
+              },
+              "toPlace": {
+                "name": "Økern T",
+                "quay": {
+                  "publicCode": "B"
+                }
+              },
+              "line": {
+                "publicCode": "24",
+                "name": "Fornebu vest - Brynseng T",
+                "presentation": {
+                  "colour": "E60000",
+                  "textColour": "FFFFFF"
+                }
+              },
+              "fromEstimatedCall": {
+                "destinationDisplay": {
+                  "frontText": "Brynseng"
+                }
+              },
+              "intermediateEstimatedCalls": [
+                {
+                  "quay": {
+                    "id": "NSR:Quay:11108"
+                  }
+                },
+                {
+                  "quay": {
+                    "id": "NSR:Quay:11088"
+                  }
+                },
+                {
+                  "quay": {
+                    "id": "NSR:Quay:11067"
+                  }
+                },
+                {
+                  "quay": {
+                    "id": "NSR:Quay:11071"
+                  }
+                }
+              ],
+              "situations": []
+            },
+            {
+              "mode": "foot",
+              "aimedStartTime": "2026-11-17T07:50:00+01:00",
+              "expectedStartTime": "2026-11-17T07:50:00+01:00",
+              "aimedEndTime": "2026-11-17T07:51:45+01:00",
+              "expectedEndTime": "2026-11-17T07:51:45+01:00",
+              "realtime": false,
+              "distance": 107.82,
+              "duration": 105,
+              "fromPlace": {
+                "name": "Økern T",
+                "quay": {
+                  "publicCode": "B"
+                }
+              },
+              "toPlace": {
+                "name": "Kuben",
+                "quay": null
+              },
+              "line": null,
+              "fromEstimatedCall": null,
+              "intermediateEstimatedCalls": [],
+              "situations": []
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-labelledby="t">
+  <title id="t">En stålkloss spent fast i en skrustikke på en arbeidsbenk. En fil ligger over klossen, en vinkelhake står på benken og en baufil henger på veggen.</title>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#c5ddd6" stroke-width="1.5"/>
+    </pattern>
+    <pattern id="teeth" width="7" height="12" patternUnits="userSpaceOnUse">
+      <path d="M0 12 7 0" stroke="#52646e" stroke-width="1.500"/>
+    </pattern>
+    <pattern id="knurl" width="6" height="6" patternUnits="userSpaceOnUse">
+      <path d="M0 6 6 0M0 0 6 6" stroke="#37464f" stroke-width="1"/>
+    </pattern>
+    <pattern id="sawteeth" width="6" height="6" patternUnits="userSpaceOnUse">
+      <path d="M0 0 3 5 6 0" fill="none" stroke="#14201d" stroke-width="1.200"/>
+    </pattern>
+  </defs>
+
+  <!-- wall -->
+  <rect width="800" height="600" fill="#dcebe6"/>
+  <rect width="800" height="600" fill="url(#grid)"/>
+  <g fill="none" stroke="#0e5a50" stroke-width="1.5" opacity="0.45">
+    <path d="M756 32h24M768 20v24"/>
+  </g>
+
+  <!-- hacksaw on a peg -->
+  <g transform="translate(-12 -14) rotate(-6 150 100)">
+    <path d="M70 136V78H232V104" fill="none" stroke="#14201d" stroke-width="13" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M70 136V78H232V104" fill="none" stroke="#52646e" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M76 82H226" stroke="#7d8f99" stroke-width="2" stroke-linecap="round"/>
+    <rect x="62" y="132" width="180" height="9" fill="#d3dde3" stroke="#14201d" stroke-width="2"/>
+    <rect x="66" y="139" width="172" height="5" fill="url(#sawteeth)"/>
+    <path d="M224 100H262Q274 100 272 112L262 168Q260 178 250 178H238Q228 178 230 168L236 136H224Z" fill="#c8553d" stroke="#14201d" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M244 112H260" stroke="#e58f82" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="151" cy="66" r="9" fill="#52646e" stroke="#14201d" stroke-width="3"/>
+    <circle cx="151" cy="66" r="3" fill="#c3d1d9"/>
+  </g>
+
+  <!-- bench -->
+  <rect x="-10" y="496" width="820" height="114" fill="#cdb07a" stroke="#14201d" stroke-width="3"/>
+  <rect x="56" y="496" width="64" height="114" fill="#b89a5e" stroke="#14201d" stroke-width="3"/>
+  <rect x="236" y="516" width="330" height="70" rx="5" fill="#d9bf8a" stroke="#14201d" stroke-width="3"/>
+  <rect x="372" y="542" width="58" height="12" rx="6" fill="#52646e" stroke="#14201d" stroke-width="2.500"/>
+  <rect x="-10" y="452" width="820" height="44" fill="#e2c994" stroke="#14201d" stroke-width="3"/>
+  <g fill="none" stroke="#c4a56c" stroke-width="2" stroke-linecap="round">
+    <path d="M30 466H210M260 480H520M560 466H770M90 484H180M610 484H730M340 464H470"/>
+  </g>
+
+  <!-- try square standing on the bench -->
+  <rect x="668" y="296" width="18" height="142" fill="#d3dde3" stroke="#14201d" stroke-width="3"/>
+  <path d="M686 312h-7M686 328h-10M686 344h-7M686 360h-10M686 376h-7M686 392h-10M686 408h-7M686 424h-10" stroke="#37464f" stroke-width="1.500"/>
+  <rect x="660" y="432" width="96" height="20" rx="2" fill="#37464f" stroke="#14201d" stroke-width="3"/>
+  <path d="M668 439H748" stroke="#52646e" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="700" cy="442" r="3" fill="#c97a06"/><circle cx="730" cy="442" r="3" fill="#c97a06"/>
+
+  <!-- vice: handle and screw -->
+  <rect x="259" y="272" width="12" height="164" fill="#c3d1d9" stroke="#14201d" stroke-width="3"/>
+  <circle cx="265" cy="270" r="10" fill="#9aaeb9" stroke="#14201d" stroke-width="3"/>
+  <circle cx="265" cy="438" r="10" fill="#9aaeb9" stroke="#14201d" stroke-width="3"/>
+  <rect x="250" y="342" width="32" height="38" rx="5" fill="#52646e" stroke="#14201d" stroke-width="3"/>
+  <rect x="280" y="350" width="22" height="22" fill="#c3d1d9" stroke="#14201d" stroke-width="3"/>
+
+  <!-- slide between the jaws -->
+  <rect x="330" y="340" width="150" height="44" fill="#c3d1d9" stroke="#14201d" stroke-width="3"/>
+  <path d="M334 350H476" stroke="#eef2f4" stroke-width="5"/>
+  <path d="M334 376H476" stroke="#9aaeb9" stroke-width="6"/>
+
+  <!-- base bolted to the bench -->
+  <path d="M398 452 410 424H640L652 452Z" fill="#0a4038" stroke="#14201d" stroke-width="3" stroke-linejoin="round"/>
+  <rect x="416" y="412" width="22" height="12" rx="2" fill="#9aaeb9" stroke="#14201d" stroke-width="2.500"/>
+  <rect x="610" y="412" width="22" height="12" rx="2" fill="#9aaeb9" stroke="#14201d" stroke-width="2.500"/>
+
+  <!-- fixed jaw, body and anvil -->
+  <path d="M476 236H526Q536 236 538 248L546 296H612Q624 296 624 308V424H456V330H476Z" fill="#0e5a50" stroke="#14201d" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M484 246H524M552 306H610" stroke="#2c8073" stroke-width="6" stroke-linecap="round"/>
+  <path d="M470 400H612" stroke="#0a4038" stroke-width="8" stroke-linecap="round"/>
+  <!-- movable jaw -->
+  <path d="M404 236H358Q346 236 344 250L334 322H308Q298 322 298 332V388Q298 398 308 398H404Z" fill="#0e7c6b" stroke="#14201d" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M360 246H396" stroke="#3aa08f" stroke-width="6" stroke-linecap="round"/>
+  <path d="M310 386H398" stroke="#0e5a50" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- workpiece -->
+  <rect x="416" y="168" width="48" height="128" fill="#c9d5dc" stroke="#14201d" stroke-width="3"/>
+  <path d="M424 176V288" stroke="#f2f5f6" stroke-width="7"/>
+  <path d="M456 176V290" stroke="#9aaeb9" stroke-width="6"/>
+  <path d="M416 168H464" stroke="#14201d" stroke-width="3"/>
+
+  <!-- jaw plates -->
+  <rect x="404" y="238" width="12" height="56" fill="#52646e" stroke="#14201d" stroke-width="2.500"/>
+  <rect x="405.500" y="240" width="9" height="52" fill="url(#knurl)"/>
+  <rect x="464" y="238" width="12" height="56" fill="#52646e" stroke="#14201d" stroke-width="2.500"/>
+  <rect x="465.500" y="240" width="9" height="52" fill="url(#knurl)"/>
+
+  <!-- file resting on the work -->
+  <g transform="translate(440 160) rotate(-3)">
+    <rect x="-172" y="-6" width="302" height="13" rx="2" fill="#9aaeb9" stroke="#14201d" stroke-width="2.500"/>
+    <rect x="-168" y="-5" width="284" height="11" fill="url(#teeth)"/>
+    <path d="M130-3.500H154V3.500H130Z" fill="#9aaeb9" stroke="#14201d" stroke-width="2.500"/>
+    <rect x="166" y="-16" width="128" height="32" rx="15" fill="#d9bf8a" stroke="#14201d" stroke-width="3"/>
+    <path d="M186-6H276M196 4H266" stroke="#b89a5e" stroke-width="2" stroke-linecap="round"/>
+    <rect x="152" y="-12" width="18" height="24" rx="2" fill="#c97a06" stroke="#14201d" stroke-width="3"/>
+    <path d="M156-6H166" stroke="#f2a20c" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- filings -->
+  <g fill="#52646e">
+    <circle cx="410" cy="184" r="2"/><circle cx="404" cy="204" r="1.800"/><circle cx="398" cy="226" r="2.200"/>
+    <circle cx="470" cy="190" r="2"/><circle cx="478" cy="214" r="1.800"/><circle cx="486" cy="230" r="2"/>
+    <circle cx="372" cy="232" r="2"/><circle cx="386" cy="230" r="1.600"/><circle cx="498" cy="232" r="1.800"/><circle cx="514" cy="231" r="2.200"/>
+    <circle cx="350" cy="446" r="2.200"/><circle cx="366" cy="448" r="1.800"/><circle cx="330" cy="448" r="1.600"/><circle cx="382" cy="447" r="2"/>
+    <circle cx="560" cy="292" r="2"/><circle cx="578" cy="293" r="1.600"/>
+  </g>
+
+  <!-- size callout -->
+  <path d="M464 206H556" fill="none" stroke="#0e5a50" stroke-width="1.500"/>
+  <circle cx="464" cy="206" r="3.500" fill="#0e5a50"/>
+  <text x="564" y="212" font-family="Figtree, 'Segoe UI', system-ui, sans-serif" font-size="19" font-weight="600" fill="#0b4a42">60 × 40</text>
+</svg>

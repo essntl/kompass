@@ -24,7 +24,7 @@ export const ARRIVAL_WINDOW = { min: 10, max: 15, target: 12 } as const;
 export const DEFAULT_QUICK_LINKS: QuickLink[] = [
   { id: 'ql-mail', label: 'Skole-e-post', url: 'https://outlook.office.com/mail/', icon: 'mail' },
   { id: 'ql-teams', label: 'Teams', url: 'https://teams.microsoft.com/', icon: 'users' },
-  { id: 'ql-visma', label: 'Visma InSchool', url: 'https://www.visma.no/inschool/', icon: 'school' },
+  { id: 'ql-visma', label: 'Visma InSchool', url: 'https://kuben-vgs.inschool.visma.no/', icon: 'school' },
   { id: 'ql-vilbli', label: 'vilbli.no', url: 'https://www.vilbli.no/', icon: 'compass' },
 ];
 

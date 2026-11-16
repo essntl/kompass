@@ -1,0 +1,347 @@
+/*
+ * Global base styles for Kompass (owned by A1).
+ * Tokens live in ./tokens.css – this file only adds base element styles, the
+ * mobile baseline, derived interaction shades and a few keyframes.
+ */
+@import '@fontsource-variable/figtree/wght.css';
+@import '@fontsource-variable/bricolage-grotesque/wght.css';
+@import './tokens.css';
+
+/*
+ * Derived shades. They are mixed from existing tokens so they follow the theme
+ * automatically; nothing here introduces a new hue.
+ */
+@theme inline {
+  /* hover / pressed fills */
+  --color-surface-hover: color-mix(in oklab, var(--surface), var(--ink) 4%);
+  --color-primary-soft-hover: color-mix(in oklab, var(--primary-soft), var(--primary) 12%);
+  --color-danger-hover: color-mix(in oklab, var(--danger), var(--ink) 12%);
+  /* text on a solid danger fill (white in light, near-black in dark) */
+  --color-danger-ink: var(--surface);
+
+  /* raised thumb inside a sunken track (segmented control) */
+  --color-raised: light-dark(var(--surface), var(--line-strong));
+  /* switch: off-track and thumb */
+  --color-track: color-mix(in srgb, var(--surface-2), var(--ink-3) 55%);
+  --color-thumb: light-dark(var(--surface), var(--ink));
+  /* placeholder text that still passes AA on surface-2 */
+  --color-placeholder: color-mix(in srgb, var(--ink-3) 60%, var(--ink-2));
+
+  --color-subj-1-soft-hover: color-mix(in oklab, var(--subj-1-soft), var(--subj-1) 14%);
+  --color-subj-2-soft-hover: color-mix(in oklab, var(--subj-2-soft), var(--subj-2) 14%);
+  --color-subj-3-soft-hover: color-mix(in oklab, var(--subj-3-soft), var(--subj-3) 14%);
+  --color-subj-4-soft-hover: color-mix(in oklab, var(--subj-4-soft), var(--subj-4) 14%);
+  --color-subj-5-soft-hover: color-mix(in oklab, var(--subj-5-soft), var(--subj-5) 14%);
+  --color-subj-6-soft-hover: color-mix(in oklab, var(--subj-6-soft), var(--subj-6) 14%);
+  --color-subj-7-soft-hover: color-mix(in oklab, var(--subj-7-soft), var(--subj-7) 14%);
+  --color-subj-8-soft-hover: color-mix(in oklab, var(--subj-8-soft), var(--subj-8) 14%);
+
+  --animate-spin-fast: spin 0.65s linear infinite;
+  --animate-page-enter: page-enter var(--dur-base) var(--ease-out) backwards;
+  --animate-dialog-in: dialog-in var(--dur-base) var(--ease-out);
+  --animate-dialog-out: dialog-out 140ms var(--ease-out) forwards;
+  --animate-overlay-in: overlay-in var(--dur-base) ease;
+  --animate-overlay-out: overlay-out 140ms ease forwards;
+}
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  /* Space the shell takes at the bottom / left of the viewport. Pages use these. */
+  --shell-bottom: calc(var(--nav-height) + var(--safe-bottom));
+  --shell-left: 0px;
+  --gutter: 16px;
+
+  --z-sticky: 20;
+  --z-nav: 30;
+  --z-overlay: 50;
+  --z-toast: 70;
+
+  --skeleton-sheen: light-dark(rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.045));
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --shell-bottom: 0px;
+    --shell-left: var(--sidebar-width);
+    --gutter: 32px;
+  }
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    /* The app owns its scrolling: no pull-to-refresh, no page rubber band. */
+    overscroll-behavior: none;
+    background-color: var(--bg);
+  }
+
+  body {
+    min-height: 100dvh;
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    min-height: 100dvh;
+    isolation: isolate;
+    /* A stray wide element must never make the whole app pan sideways on a phone. */
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  p,
+  li {
+    text-wrap: pretty;
+  }
+
+  /* 16px keeps iOS Safari from zooming the page on focus. */
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+
+  /* No double-tap zoom on controls, so `click` fires without delay. */
+  a,
+  button,
+  label,
+  summary,
+  input,
+  select,
+  textarea,
+  [role='button'],
+  [role='tab'],
+  [role='radio'],
+  [role='switch'],
+  [role='slider'] {
+    touch-action: manipulation;
+  }
+
+  /* Controls are not content: no text selection or long-press callout. */
+  button,
+  summary,
+  [role='button'],
+  [role='tab'],
+  [role='radio'],
+  [role='switch'] {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  button:not(:disabled),
+  summary,
+  [role='button']:not([aria-disabled='true']),
+  [role='tab'],
+  [role='radio'],
+  select {
+    cursor: pointer;
+  }
+
+  /* One focus ring for everything focusable. Components must not remove it. */
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* Programmatic focus targets (main, headings) do not need a ring. */
+  [tabindex='-1']:focus-visible {
+    outline: none;
+  }
+
+  ::selection {
+    background-color: var(--primary-soft);
+    color: var(--primary-soft-ink);
+  }
+
+  /* Numbers that sit in columns or tick (clock times, counters). */
+  time,
+  .nums,
+  [data-nums] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Thin, quiet scrollbars where a real pointer exists. */
+  @media (hover: hover) and (pointer: fine) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--line-strong) transparent;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ utilities */
+
+/* Horizontal scroll rows (chips, tabs) without a visible scrollbar. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* A scroll area that keeps its own bounce but never drags the page along. */
+@utility scroll-area {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Extends a small control's hit area to the 44px minimum without changing its look. */
+@utility hit-44 {
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, var(--tap));
+    height: max(100%, var(--tap));
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* ------------------------------------------------------------------ components */
+
+/* Skeleton: a soft sheen sweeping over a sunken block. Transform-only. */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--surface-2);
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--skeleton-sheen) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: skeleton-sheen 1.6s var(--ease-in-out) infinite;
+}
+
+/* Skip link: off-screen until focused. */
+.skip-link {
+  position: fixed;
+  left: 12px;
+  top: calc(var(--safe-top) + 12px);
+  z-index: 100;
+  transform: translateY(calc(-100% - var(--safe-top) - 24px));
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* While the theme flips, nothing should cross-fade at its own pace. */
+.theme-switching,
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
+}
+
+/* ------------------------------------------------------------------ keyframes */
+
+@keyframes skeleton-sheen {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(6px);
+  }
+}
+
+@keyframes dialog-out {
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes overlay-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/*
+ * Reduced motion: fewer and gentler, not zero. Movement is removed, fades and
+ * colour changes stay. (JS-driven motion is handled by <MotionConfig reducedMotion="user">.)
+ */
+@media (prefers-reduced-motion: reduce) {
+  .animate-page-enter,
+  .animate-dialog-in {
+    animation-name: fade-in;
+  }
+
+  .animate-dialog-out {
+    animation-name: overlay-out;
+  }
+
+  .skeleton::after {
+    animation: none;
+  }
+
+  .skip-link {
+    transition: none;
+  }
+
+  [data-vaul-drawer],
+  [data-vaul-overlay] {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+  }
+
+  /* Press feedback and sliding thumbs: state still changes, it just does not travel. */
+  .motion-move {
+    transition-property: opacity, background-color, border-color, color !important;
+  }
+}

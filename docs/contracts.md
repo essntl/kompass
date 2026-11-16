@@ -344,3 +344,78 @@ Streaming functions take `{ onDelta, onSources?, signal }` and resolve with `{ m
 - Keep files focused: one component per file, feature logic in pure functions that can be tested.
 - End with a short report: what you built, files touched, anything unfinished or uncertain,
   and any change you need in a file you do not own.
+
+## 10. As-built notes (phase 1) – read before writing a feature
+
+The foundation is in place. **Read the source before using something**; the dev gallery
+`src/app/dev/UiGallery.tsx` (route `/dev/ui`) shows every UI component with realistic usage.
+
+### UI library (`@/components/ui`)
+Exports: `Page`, `PageHeader`, `Section`, `Card`, `Button`, `ButtonLink`, `IconButton`, `Chip`,
+`ChipGroup`, `Badge`, `DemoBadge`, `Avatar`, `initialsOf`, `Skeleton`, `SkeletonText`,
+`Spinner`, `EmptyState`, `ErrorState`, `Field`, `Input`, `Textarea`, `Select`, `Switch`,
+`Slider`, `SegmentedControl`, `ThemeSwitcher`, `Sheet`, `ConfirmDialog`, `Toaster`, `toast`,
+`Stagger`, `StaggerItem`, `Collapse`, `Tabs`, `TabPanel`, `BrandMark`, `subjectColor`,
+`useMediaQuery`, `useIsDesktop`, `useAiStatus`, `cn`.
+
+- `Page`: `width`, plus `fill` for full-height layouts such as chat. Children are spaced 24px
+  apart. The page-enter transition lives in `Page` (enter only). **The document scrolls**,
+  not an inner container.
+- `PageHeader` also sets `document.title`.
+- `Card`: tones `default | sunken | primary | primary-soft | accent` (accent is soft amber).
+  `padding="lg"` also uses the 24px radius.
+- `ButtonLink`: `to`; `https://`, `mailto:` and `tel:` values render an external link.
+- `IconButton`: `icon` prop (not children) and `label`.
+- `Chip`: boolean `selected` makes it a toggle; undefined gives a suggestion chip.
+  `ChipGroup`: `label`, `layout: 'wrap' | 'scroll'`.
+- `Input` / `Textarea` / `Select` wrap themselves in a `Field` when `label` is passed
+  (`Input` has `leading`/`trailing`, `Textarea` has `autoGrow`, `Select` has `options`).
+- `Switch` with `label` renders a full tappable row. `Slider` is single-value:
+  `value`, `onValueChange`, `onValueCommit`, `formatValue`, `marks`.
+- `SegmentedControl`: `options: { value, label, icon? }[]`, `value`, `onChange`.
+- `Sheet`: also `size`, `dismissible`, `flush`. `ConfirmDialog`: `confirmLabel`, `tone`, `onConfirm`.
+- `Tabs`: `tabs: { value, label, count? }[]`, `value`, `onChange`, `aria-label`.
+- `toast(msg, { description, duration, action })`, `toast.success`, `toast.error`.
+- `Avatar`: sizes `sm | md | lg | xl`, `shape`, `initials` (use for company logos too).
+- `subjectColor(n)` → `{ solid, soft, ink, border, softHover, text }`.
+- `cn` is plain `clsx` – a `className` cannot override a utility the component already sets.
+- `global.css` utilities: `hit-44`, `scroll-area`, `no-scrollbar`; variables `--shell-bottom`,
+  `--shell-left`, `--gutter`, `--safe-*`. Extra colour utilities derived there:
+  `surface-hover`, `raised`, `track`, `placeholder`, `danger-ink`.
+- A single-column grid needs an explicit `grid-cols-1`, or a truncating child can push the
+  page wider than the viewport.
+- Contrast: on `bg-surface-2` and `bg-primary-soft` use `text-ink-2`, not `text-ink-3`.
+  Never use `text-accent` for text; use `text-accent-soft-ink`.
+- Motion presets and variants: `@/lib/motion`.
+
+### Data layer
+- `@/lib/date`: `parseLocal`, `toDate`, `toISODate`, `todayISO`, `toLocalDateTime`, `atTime`,
+  `localToInstant`, `minutesBetween`, `daysUntil`, `addDaysISO`, `startOfWeekISO`,
+  `weekDays(input, count)` (ISO strings, Monday first), `isoWeek`, `isSameDay`, `isWeekend`,
+  `formatTime`, `formatTimeRange`, `formatDayLong`, `formatDayShort`, `formatWeekday`,
+  `formatDate`, `formatMonthYear`, `relativeDay`, `formatDaysUntil`, `formatCountdown(ms)`,
+  `formatDuration(minutes)`, `formatTimestamp`.
+- `@/lib/timetable`: `compareEvents`, `eventsOn`, `classesOn`, `firstClassOn`, `lastClassOn`,
+  `nextClass`, `currentClass`, `classesBetween`, `eventPlace(event, school)`,
+  `isAbsentFrom(classEvent, events)`, `withoutAbsentClasses(events)`, `minutesOfDay`,
+  hooks `useCalendarEvents()` and `useNow(intervalMs)`.
+  **Classes are not hidden by absences** – use `withoutAbsentClasses` / `isAbsentFrom` when you
+  mean "classes I actually attend".
+- `@/lib/absence`: `ABSENCE_REASONS`, `ABSENCE_REASON_LABELS`, `planAbsence`,
+  `absenceNoticeText`, `describeAbsence`, `teacherForEvent`, `isContactTeacher`.
+- `@/lib/photos`: `savePhoto`, `usePhotoUrl(ref)` (null while loading), `deletePhoto`,
+  `fileToDownscaledJpeg`, `photoToBase64(ref)`.
+- Stores – extras beyond §7: timetable `useSubject(id)`, `useSubjectMap()`; messages
+  `ensureThread(teacherId)`, `useUnreadCount()`, `useThreadUnreadCount`, `useThreadMessages`,
+  `useThreadSummaries()`, `useThread`, `useTeacher`, `useAbsence`; portfolio
+  `useSortedEntries()`, `usePortfolioEntry(id)`; apprenticeships `useSavedListings()`,
+  `useListing(id)`, `useIsSaved(id)`, `useApplicationFor(listingId)`.
+- Absence events: whole day = one all-day event per date; per class = one event per class at
+  the class time titled "Fravær: <fag>". Deadline events have id `deadline-<listingId>`.
+- `resetDemoData()` resets the five core stores, removes other `kompass:*` localStorage keys
+  and clears photos. A feature with its own persisted store should reload after reset.
+- Seed ids: subjects `subj-pt|kst|yff|norsk|engelsk|matematikk|naturfag|kroppsoving`;
+  teachers `t-hilde` (kontaktlærer) `|morten|ingrid|amir|kristian`; threads `th-<name>`;
+  entries `pe-weld|circuit|lathe|box|vice`; listings `l-<company>`.
+- Seed week: Mon 08:15, Tue 09:55, Wed 08:15, Thu 08:15 at school then YFF 10:30–15:00 at the
+  work placement (`location` set), Fri 08:15.
