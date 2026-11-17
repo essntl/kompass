@@ -3,23 +3,32 @@
  * (lib/live.ts) or the mock (mock/*) depending on whether an API key is configured.
  */
 import { Router, type NextFunction, type Request, type Response } from 'express';
-import type { AbsenceDetectResponse, PortfolioDescribeResponse } from '../../shared/api';
+import type { AbsenceDetectResponse, PortfolioDescribeResponse, TimetablePdfResponse } from '../../shared/api';
 import { finalizeDetection } from '../lib/absence';
 import { getAnthropicClient, isAbortError, mapAiError } from '../lib/anthropic';
-import { describePortfolioLive, detectAbsenceLive, streamApplicationLive, streamInfoLive } from '../lib/live';
+import {
+  describePortfolioLive,
+  detectAbsenceLive,
+  readTimetablePdfLive,
+  streamApplicationLive,
+  streamInfoLive,
+} from '../lib/live';
 import { createSseWriter, type SseWriter } from '../lib/sse';
+import { buildTimetableResponse, decodePdf } from '../lib/timetable';
 import {
   absenceDetectSchema,
   applicationTextSchema,
   infoAskSchema,
   parseInput,
   portfolioDescribeSchema,
+  timetablePdfSchema,
 } from '../lib/validate';
 import { detectAbsenceHeuristic } from '../mock/absence';
 import { buildMockApplicationText } from '../mock/application';
 import { buildMockInfoAnswer } from '../mock/info';
 import { buildMockCompetence } from '../mock/portfolio';
 import { streamMockText } from '../mock/stream';
+import { MOCK_TIMETABLE } from '../mock/timetable';
 
 export const aiRouter = Router();
 
@@ -60,6 +69,35 @@ aiRouter.post('/portfolio/describe', async (req, res) => {
     result = { competence: buildMockCompetence(body) };
   }
   res.json(result);
+});
+
+/** A PDF takes 10–30 s live; the mock waits a little longer than the others so the UI's waiting state shows. */
+const MOCK_PDF_DELAY_MS = 1200;
+
+aiRouter.post('/timetable/pdf', async (req, res) => {
+  const body = parseInput(timetablePdfSchema, req.body);
+  decodePdf(body.pdf);
+  const client = getAnthropicClient();
+
+  let result: TimetablePdfResponse;
+  if (client) {
+    // Stop paying for the request when the student cancels or closes the sheet.
+    const controller = new AbortController();
+    res.on('close', () => {
+      if (!res.writableEnded) controller.abort();
+    });
+    try {
+      const output = await readTimetablePdfLive(client, body, controller.signal);
+      result = buildTimetableResponse(output, body, { mock: false });
+    } catch (err) {
+      if (controller.signal.aborted || isAbortError(err)) return; // the browser went away
+      throw mapAiError(err);
+    }
+  } else {
+    await sleep(MOCK_PDF_DELAY_MS);
+    result = buildTimetableResponse(MOCK_TIMETABLE, body, { mock: true });
+  }
+  if (!res.writableEnded) res.json(result);
 });
 
 /**

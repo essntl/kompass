@@ -117,6 +117,29 @@ export interface ApplicationTextRequest {
   }>;
 }
 
+// ---------------------------------------------------------------- POST /api/ai/timetable/pdf
+
+/** A timetable exported as PDF (Visma InSchool has no .ics export). */
+export interface TimetablePdfRequest {
+  /** The PDF as base64 without the data: prefix. Max about 5 MB before encoding. */
+  pdf: string;
+  fileName?: string;
+  /** The student's "today": anchors a timetable that shows weekdays but no dates. */
+  today: ISODate;
+}
+
+export interface TimetablePdfResponse {
+  /** A complete iCalendar document (VCALENDAR) that the normal .ics import can read. */
+  ics: string;
+  /** Lessons found in the PDF, before any weekly repetition. */
+  lessonCount: number;
+  /** Monday of the week the lessons were placed in. */
+  weekStart: ISODate;
+  /** Last day of the weekly repetition, or null when the lessons do not repeat. */
+  repeatsUntil: ISODate | null;
+  mock: boolean;
+}
+
 // ---------------------------------------------------------------- SSE events (info + application-text)
 
 /**

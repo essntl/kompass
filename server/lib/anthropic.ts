@@ -40,6 +40,8 @@ export const AI_SETTINGS = {
   info: { maxTokens: 3000, effort: 'medium' },
   portfolioDescribe: { maxTokens: 3000, effort: 'low' },
   applicationText: { maxTokens: 2500, effort: 'low' },
+  // Reading a whole week from a PDF grid: room for ~80 lessons of JSON plus thinking.
+  timetablePdf: { maxTokens: 12000, effort: 'medium' },
 } as const satisfies Record<string, RouteSettings>;
 
 /** Common request fields for a route: model, token cap, adaptive thinking and effort. */

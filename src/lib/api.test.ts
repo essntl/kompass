@@ -4,6 +4,7 @@ import {
   detectAbsence,
   geocode,
   getHealth,
+  importTimetablePdf,
   isAbortError,
   planTrips,
   streamApplicationText,
@@ -61,6 +62,30 @@ describe('JSON routes', () => {
 
     expect(fetchSpy.mock.calls[0][0]).toBe('/api/entur/geocode?q=Kabelgata+10&lat=59.92&lon=10.76');
     expect(fetchSpy.mock.calls[1][0]).toBe('/api/entur/geocode?q=%C3%98kern');
+  });
+
+  it('POSTs a timetable PDF and returns the .ics answer', async () => {
+    const answer = { ics: 'BEGIN:VCALENDAR', lessonCount: 13, weekStart: '2026-11-16', repeatsUntil: '2027-06-20', mock: false };
+    const fetchSpy = mockFetch(() => json(answer));
+    const controller = new AbortController();
+    const request = { pdf: 'JVBERi0=', fileName: 'timeplan.pdf', today: '2026-11-17' };
+
+    await expect(importTimetablePdf(request, { signal: controller.signal })).resolves.toEqual(answer);
+
+    const [url, init] = fetchSpy.mock.calls[0];
+    expect(url).toBe('/api/ai/timetable/pdf');
+    expect(init?.method).toBe('POST');
+    expect(init?.signal).toBe(controller.signal);
+    expect(JSON.parse(String(init?.body))).toEqual(request);
+  });
+
+  it('passes the "not a timetable" error from the PDF import through', async () => {
+    mockFetch(() => json({ error: { code: 'BAD_REQUEST', message: 'Vi fant ingen timeplan i PDF-en.' } }, 422));
+    await expect(importTimetablePdf({ pdf: 'JVBERi0=', today: '2026-11-17' })).rejects.toMatchObject({
+      code: 'BAD_REQUEST',
+      status: 422,
+      message: 'Vi fant ingen timeplan i PDF-en.',
+    });
   });
 
   it('turns the server error body into an ApiError', async () => {

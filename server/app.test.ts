@@ -97,6 +97,37 @@ describe('API server (mock mode)', () => {
     expect(competence.suggestedGoals.length).toBeGreaterThanOrEqual(1);
   });
 
+  describe('POST /api/ai/timetable/pdf', () => {
+    const pdf = Buffer.from('%PDF-1.7\n1 0 obj\n<<>>\nendobj\n', 'latin1').toString('base64');
+
+    it('answers with the sample timetable as .ics in mock mode', async () => {
+      const response = await postJson('/api/ai/timetable/pdf', { pdf, fileName: 'timeplan.pdf', today: '2026-11-17' });
+      expect(response.status).toBe(200);
+      const json = await response.json();
+      expect(json).toMatchObject({ lessonCount: 13, weekStart: '2026-11-16', repeatsUntil: '2027-06-20', mock: true });
+      expect(json.ics).toMatch(/^BEGIN:VCALENDAR\r\n/);
+      expect(json.ics).toContain('LOCATION:Dronning Margretes vei 15\\, Oslo');
+    });
+
+    it('rejects a file that is not a PDF with a Norwegian message', async () => {
+      const notPdf = Buffer.from('BEGIN:VCALENDAR\r\nEND:VCALENDAR').toString('base64');
+      const response = await postJson('/api/ai/timetable/pdf', { pdf: notPdf, today: '2026-11-17' });
+      expect(response.status).toBe(400);
+      expect((await response.json()).error).toEqual({
+        code: 'BAD_REQUEST',
+        message: 'Filen er ikke en PDF. Lagre timeplanen som PDF fra Visma InSchool og prøv igjen.',
+      });
+    });
+
+    it('validates the body', async () => {
+      for (const body of [{}, { pdf, today: '17.11.2026' }, { pdf, today: '2026-02-30' }, { pdf: 'not base64!', today: '2026-11-17' }]) {
+        const response = await postJson('/api/ai/timetable/pdf', body);
+        expect(response.status).toBe(400);
+        expect((await response.json()).error.code).toBe('BAD_REQUEST');
+      }
+    });
+  });
+
   it('streams an info answer as delta events, then sources, then done', async () => {
     const response = await postJson('/api/ai/info', { question: 'Hva er et opplæringskontor?' });
     expect(response.status).toBe(200);

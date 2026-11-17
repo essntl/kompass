@@ -3,9 +3,17 @@ import { describe, expect, it } from 'vitest';
 import type { AbsenceDetectRequest, StreamEvent } from '../../shared/api';
 import { getInfoSource } from '../../shared/infoSources';
 import { RECOMMEND_SOURCES_TOOL } from '../prompts/info';
-import { AiRefusalError, mapAiError } from './anthropic';
+import { AI_SETTINGS, AiRefusalError, mapAiError } from './anthropic';
 import { HttpError } from './errors';
-import { describePortfolioLive, detectAbsenceLive, streamApplicationLive, streamInfoLive } from './live';
+import {
+  describePortfolioLive,
+  detectAbsenceLive,
+  readTimetablePdfLive,
+  streamApplicationLive,
+  streamInfoLive,
+  TIMETABLE_PDF_TIMEOUT_MS,
+} from './live';
+import { buildTimetableResponse } from './timetable';
 import type { SseWriter } from './sse';
 
 /**
@@ -289,6 +297,81 @@ describe('describePortfolioLive', () => {
     const content = calls[0].messages[0].content;
     expect(content[0]).toEqual({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: 'AAAA' } });
     expect(content[1].type).toBe('text');
+  });
+});
+
+describe('readTimetablePdfLive', () => {
+  const output = {
+    isTimetable: true,
+    weekNumber: 47,
+    year: null,
+    lessons: [
+      { weekday: 'mandag', date: null, start: '8.15', end: '09:45', subject: 'Norsk', room: 'B214', teacher: 'Ingrid Solheim', address: null },
+      { weekday: 'mandag', date: null, start: '11:30', end: '12:00', subject: 'Lunsj', room: null, teacher: null, address: null },
+    ],
+  };
+
+  it('sends the PDF as a base64 document block before the text and asks for structured output', async () => {
+    const { client, calls } = fakeClient([
+      { message: { stop_reason: 'end_turn', content: [thinking, text(JSON.stringify(output))] } },
+    ]);
+    const controller = new AbortController();
+
+    const result = await readTimetablePdfLive(
+      client,
+      { pdf: 'JVBERi0xLjc=', fileName: 'timeplan.pdf', today: '2026-11-17' },
+      controller.signal,
+    );
+
+    expect(result).toEqual(output);
+    const params = calls[0];
+    expect(params.model).toBe('claude-haiku-5-5');
+    expect(params.thinking).toEqual({ type: 'adaptive' });
+    expect(params.output_config.format.type).toBe('json_schema');
+    expect(params.output_config.effort).toBe(AI_SETTINGS.timetablePdf.effort);
+    expect(params.temperature).toBeUndefined();
+    const content = params.messages[0].content;
+    expect(content[0]).toEqual({
+      type: 'document',
+      source: { type: 'base64', media_type: 'application/pdf', data: 'JVBERi0xLjc=' },
+    });
+    expect(content[1]).toMatchObject({ type: 'text' });
+    expect(content[1].text).toContain('timeplan.pdf');
+  });
+
+  it('passes the abort signal and a longer timeout to the SDK', async () => {
+    const seen: unknown[] = [];
+    const client = {
+      messages: {
+        async create(_params: unknown, options: unknown) {
+          seen.push(options);
+          return { stop_reason: 'end_turn', content: [text(JSON.stringify(output))] };
+        },
+      },
+    } as unknown as Anthropic;
+    const controller = new AbortController();
+    await readTimetablePdfLive(client, { pdf: 'JVBERi0=', today: '2026-11-17' }, controller.signal);
+    expect(seen[0]).toEqual({ signal: controller.signal, timeout: TIMETABLE_PDF_TIMEOUT_MS });
+  });
+
+  it('turns the model output into an importable response, cleaning it in code', async () => {
+    const { client } = fakeClient([{ message: { stop_reason: 'end_turn', content: [text(JSON.stringify(output))] } }]);
+    const read = await readTimetablePdfLive(client, { pdf: 'JVBERi0=', today: '2026-11-17' });
+    const response = buildTimetableResponse(read, { today: '2026-11-17' }, { mock: false });
+    expect(response).toMatchObject({ lessonCount: 1, weekStart: '2026-11-16', repeatsUntil: '2027-06-20', mock: false });
+    expect(response.ics).toContain('DTSTART;TZID=Europe/Oslo:20261116T081500');
+    expect(response.ics).not.toContain('Lunsj');
+  });
+
+  it('rejects malformed output, refusals and cut-off answers', async () => {
+    const bad = fakeClient([{ message: { stop_reason: 'end_turn', content: [text('{"isTimetable": "ja"}')] } }]);
+    await expect(readTimetablePdfLive(bad.client, { pdf: 'JVBERi0=', today: '2026-11-17' })).rejects.toMatchObject({ code: 'AI_ERROR' });
+
+    const refusal = fakeClient([{ message: { stop_reason: 'refusal', stop_details: null, content: [] } }]);
+    await expect(readTimetablePdfLive(refusal.client, { pdf: 'JVBERi0=', today: '2026-11-17' })).rejects.toBeInstanceOf(AiRefusalError);
+
+    const cutOff = fakeClient([{ message: { stop_reason: 'max_tokens', content: [text('{"lessons": [')] } }]);
+    await expect(readTimetablePdfLive(cutOff.client, { pdf: 'JVBERi0=', today: '2026-11-17' })).rejects.toMatchObject({ code: 'AI_ERROR' });
   });
 });
 

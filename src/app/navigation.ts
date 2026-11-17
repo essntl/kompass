@@ -1,5 +1,6 @@
 import {
   CalendarDays,
+  ClipboardCheck,
   Ellipsis,
   HardHat,
   House,
@@ -24,6 +25,12 @@ const HOME: NavDestination = { path: '/', label: 'Hjem', icon: House };
 const TIMETABLE: NavDestination = { path: '/timeplan', label: 'Timeplan', icon: CalendarDays };
 const TRAVEL: NavDestination = { path: '/reise', label: 'Reise', icon: Route };
 const MESSAGES: NavDestination = { path: '/meldinger', label: 'Meldinger', icon: MessageCircle };
+const ASSESSMENTS: NavDestination = {
+  path: '/vurderinger',
+  label: 'Vurderinger',
+  icon: ClipboardCheck,
+  description: 'Prøver, innleveringer og tilbakemeldinger',
+};
 const INFO: NavDestination = {
   path: '/info',
   label: 'Info-hjørnet',
@@ -52,11 +59,19 @@ export const MORE: NavDestination = { path: '/mer', label: 'Mer', icon: Ellipsis
 
 /** The four everyday destinations: first in the sidebar, and in the bottom nav before "Mer". */
 export const PRIMARY_NAV: readonly NavDestination[] = [HOME, TIMETABLE, TRAVEL, MESSAGES];
+/** The sidebar's first group: the everyday destinations plus Vurderinger (after Meldinger). */
+export const SIDEBAR_PRIMARY_NAV: readonly NavDestination[] = [...PRIMARY_NAV, ASSESSMENTS];
 /** Sidebar group "Veien videre". */
 export const FUTURE_NAV: readonly NavDestination[] = [INFO, PORTFOLIO, APPRENTICESHIPS];
 export const SETTINGS_NAV: NavDestination = SETTINGS;
 /** What the "Mer" page lists, in order. */
-export const MORE_NAV: readonly NavDestination[] = [INFO, PORTFOLIO, APPRENTICESHIPS, SETTINGS];
+export const MORE_NAV: readonly NavDestination[] = [
+  ASSESSMENTS,
+  INFO,
+  PORTFOLIO,
+  APPRENTICESHIPS,
+  SETTINGS,
+];
 /** Mobile bottom navigation. */
 export const BOTTOM_NAV: readonly NavDestination[] = [...PRIMARY_NAV, MORE];
 

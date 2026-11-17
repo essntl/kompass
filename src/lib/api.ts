@@ -20,6 +20,8 @@ import type {
   PortfolioDescribeRequest,
   PortfolioDescribeResponse,
   StreamEvent,
+  TimetablePdfRequest,
+  TimetablePdfResponse,
   TripsRequest,
   TripsResponse,
 } from '@shared/api';
@@ -228,6 +230,14 @@ export function describePortfolioEntry(
   options?: RequestOptions,
 ): Promise<PortfolioDescribeResponse> {
   return postJson<PortfolioDescribeResponse>('/ai/portfolio/describe', request, options);
+}
+
+/**
+ * POST /api/ai/timetable/pdf – the AI reads a timetable PDF and the server answers with an
+ * .ics document for the normal import. Takes 10–30 seconds live; pass a `signal` to cancel.
+ */
+export function importTimetablePdf(request: TimetablePdfRequest, options?: RequestOptions): Promise<TimetablePdfResponse> {
+  return postJson<TimetablePdfResponse>('/ai/timetable/pdf', request, options);
 }
 
 /** POST /api/ai/application-text – streams the draft. */

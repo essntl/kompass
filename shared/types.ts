@@ -300,9 +300,47 @@ export interface Application {
   submittedAt: ISOInstant;
 }
 
+// ---------------------------------------------------------------- assessments
+
+/** The Norwegian grade scale. */
+export type Grade = 1 | 2 | 3 | 4 | 5 | 6;
+
+/** Prøve, innlevering, muntlig presentasjon, praktisk arbeid, fagsamtale. */
+export type AssessmentKind = 'prove' | 'innlevering' | 'muntlig' | 'praktisk' | 'fagsamtale';
+
+export interface AssessmentResult {
+  /** Omitted for an assessment without a grade ("vurdering uten karakter"). */
+  grade?: Grade;
+  /** The teacher's feedback: what went well. */
+  feedback: string;
+  /** "Framovermelding": what to work on next. */
+  nextSteps?: string;
+  assessedAt: ISODate;
+}
+
+export interface Assessment {
+  id: string;
+  subjectId: string;
+  teacherId?: string;
+  title: string;
+  kind: AssessmentKind;
+  /** The day it is held, or the due date of a hand-in. */
+  date: ISODate;
+  /** `HH:mm`: when it starts, or when a hand-in is due. */
+  time?: string;
+  /** What it covers and how to prepare. */
+  description?: string;
+  /** Competence goals it assesses, paraphrased from the curriculum. */
+  goals?: string[];
+  /** Hand-ins only: the student has marked it as handed in. */
+  submitted?: boolean;
+  /** Set once the teacher has assessed it. */
+  result?: AssessmentResult;
+}
+
 // ---------------------------------------------------------------- reminders (derived)
 
-export type ReminderKind = 'deadline' | 'event' | 'message' | 'absence';
+export type ReminderKind = 'deadline' | 'event' | 'message' | 'absence' | 'assessment';
 
 export interface Reminder {
   id: string;

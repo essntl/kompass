@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { AbsenceRecord, CalendarEvent, Listing, Message } from '@shared/types';
+import type { AbsenceRecord, Assessment, CalendarEvent, Listing, Message } from '@shared/types';
 import { buildReminders, isUrgent, reminderWhen, type ReminderSources } from './reminders';
 
 const now = new Date(2026, 10, 16, 7, 30); // Monday
@@ -46,6 +46,16 @@ const custom = (id: string, start: string): CalendarEvent => ({
   source: 'manual',
 });
 
+const assessment = (id: string, date: string, patch: Partial<Assessment> = {}): Assessment => ({
+  id,
+  subjectId: 'subj-matematikk',
+  title: `Prøve ${id}`,
+  kind: 'prove',
+  date,
+  time: '12:00',
+  ...patch,
+});
+
 function sources(patch: Partial<ReminderSources> = {}): ReminderSources {
   return {
     listings: [],
@@ -62,6 +72,8 @@ function sources(patch: Partial<ReminderSources> = {}): ReminderSources {
     ],
     messages: [],
     absences: [],
+    assessments: [],
+    subjects: [{ id: 'subj-matematikk', name: 'Matematikk 1P-Y', short: 'Matte', color: 5, vocational: false }],
     now,
     ...patch,
   };
@@ -155,6 +167,35 @@ describe('buildReminders', () => {
     });
   });
 
+  it('includes assessments within 7 days, not handed-in, past or assessed ones', () => {
+    const reminders = buildReminders(
+      sources({
+        assessments: [
+          assessment('soon', '2026-11-19'),
+          assessment('edge', '2026-11-23'),
+          assessment('far', '2026-11-24'),
+          assessment('past', '2026-11-13'),
+          assessment('handed-in', '2026-11-18', { kind: 'innlevering', time: '23:59', submitted: true }),
+          assessment('due', '2026-11-18', { kind: 'innlevering', time: '23:59' }),
+          assessment('graded', '2026-11-17', { result: { grade: 4, feedback: '', assessedAt: '2026-11-16' } }),
+        ],
+      }),
+    );
+    expect(reminders.map((r) => r.id)).toEqual([
+      'assessment-due',
+      'assessment-soon',
+      'assessment-edge',
+    ]);
+    expect(reminders[1]).toEqual({
+      id: 'assessment-soon',
+      kind: 'assessment',
+      title: 'Prøve soon',
+      detail: 'Matematikk 1P-Y · Prøve',
+      due: '2026-11-19T12:00',
+      href: '/vurderinger/soon',
+    });
+  });
+
   it('sorts everything by due time', () => {
     const reminders = buildReminders(
       sources({
@@ -162,9 +203,16 @@ describe('buildReminders', () => {
         savedIds: ['l-a', 'l-b'],
         events: [custom('e', '2026-11-20T13:15')],
         messages: [message('1', 'th-hilde', '2026-11-16T06:00:00.000Z')],
+        assessments: [assessment('a', '2026-11-18', { time: '08:15' })],
       }),
     );
-    expect(reminders.map((r) => r.kind)).toEqual(['message', 'deadline', 'event', 'deadline']);
+    expect(reminders.map((r) => r.kind)).toEqual([
+      'message',
+      'deadline',
+      'assessment',
+      'event',
+      'deadline',
+    ]);
   });
 });
 
@@ -177,6 +225,9 @@ describe('reminder labels', () => {
       'på onsdag kl. 18:00',
     );
     expect(reminderWhen({ ...deadline, kind: 'absence', due: '2026-11-17' }, now)).toBe('i morgen');
+    expect(reminderWhen({ ...deadline, kind: 'assessment', due: '2026-11-17T12:00' }, now)).toBe(
+      'i morgen kl. 12:00',
+    );
     expect(reminderWhen({ ...deadline, due: undefined }, now)).toBeNull();
   });
 
@@ -184,5 +235,11 @@ describe('reminder labels', () => {
     expect(isUrgent(deadline, now)).toBe(true);
     expect(isUrgent({ ...deadline, due: '2026-11-24' }, now)).toBe(false);
     expect(isUrgent({ ...deadline, kind: 'event' }, now)).toBe(false);
+  });
+
+  it('marks assessments today or tomorrow as urgent', () => {
+    const test = { ...deadline, kind: 'assessment' as const };
+    expect(isUrgent({ ...test, due: '2026-11-17T12:00' }, now)).toBe(true);
+    expect(isUrgent({ ...test, due: '2026-11-18T12:00' }, now)).toBe(false);
   });
 });

@@ -1,5 +1,6 @@
 import { clearPhotos } from '@/lib/photos';
 import { useApprenticeshipStore } from './apprenticeships';
+import { useAssessmentStore } from './assessments';
 import { useMessagesStore } from './messages';
 import { kompassStorageKeys, removeStorageKey } from './persist';
 import { usePortfolioStore } from './portfolio';
@@ -13,6 +14,7 @@ const CORE_KEYS = new Set([
   'kompass:messages',
   'kompass:portfolio',
   'kompass:apprenticeships',
+  'kompass:assessments',
 ]);
 
 /**
@@ -29,6 +31,7 @@ export async function resetDemoData(): Promise<void> {
   useMessagesStore.getState().reset();
   usePortfolioStore.getState().reset();
   useApprenticeshipStore.getState().reset();
+  useAssessmentStore.getState().reset();
 
   for (const key of kompassStorageKeys()) {
     if (!CORE_KEYS.has(key)) removeStorageKey(key);

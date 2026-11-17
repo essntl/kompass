@@ -1,5 +1,14 @@
 import type { Reminder, ReminderKind } from '@shared/types';
-import { CalendarDays, ChevronRight, CircleCheck, Clock, Hourglass, MessageCircle, UserX } from 'lucide-react';
+import {
+  CalendarDays,
+  ChevronRight,
+  CircleCheck,
+  ClipboardCheck,
+  Clock,
+  Hourglass,
+  MessageCircle,
+  UserX,
+} from 'lucide-react';
 import { motion, type Variants } from 'motion/react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
@@ -12,6 +21,7 @@ const KIND: Record<ReminderKind, { icon: ReactNode; tile: string; label: string 
   deadline: { icon: <Hourglass />, tile: 'bg-accent-soft text-accent-soft-ink', label: 'Frist' },
   event: { icon: <CalendarDays />, tile: 'bg-info-soft text-info-soft-ink', label: 'Avtale' },
   absence: { icon: <UserX />, tile: 'bg-danger-soft text-danger-soft-ink', label: 'Fravær' },
+  assessment: { icon: <ClipboardCheck />, tile: 'bg-surface-2 text-ink', label: 'Vurdering' },
 };
 
 /*
@@ -41,7 +51,7 @@ export function RemindersSection({ reminders, now }: RemindersSectionProps) {
             size="compact"
             icon={<CircleCheck />}
             title="Alt er i rute"
-            description="Ingen nye meldinger, frister eller avtaler å følge med på akkurat nå."
+            description="Ingen nye meldinger, prøver, frister eller avtaler å følge med på akkurat nå."
           />
         </Card>
       ) : (

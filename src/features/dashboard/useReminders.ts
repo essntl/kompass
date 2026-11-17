@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { Reminder } from '@shared/types';
 import { useNow } from '@/lib/timetable';
 import { useApprenticeshipStore } from '@/stores/apprenticeships';
+import { useAssessmentStore } from '@/stores/assessments';
 import { useMessagesStore } from '@/stores/messages';
 import { useTimetableStore } from '@/stores/timetable';
 import { buildReminders } from './logic/reminders';
@@ -24,6 +25,8 @@ export function useReminders(now?: Date): Reminder[] {
   const teachers = useMessagesStore((s) => s.teachers);
   const messages = useMessagesStore((s) => s.messages);
   const absences = useMessagesStore((s) => s.absences);
+  const assessments = useAssessmentStore((s) => s.assessments);
+  const subjects = useTimetableStore((s) => s.subjects);
 
   return useMemo(
     () =>
@@ -36,8 +39,22 @@ export function useReminders(now?: Date): Reminder[] {
         teachers,
         messages,
         absences,
+        assessments,
+        subjects,
         now: new Date(minute * 60_000),
       }),
-    [listings, savedIds, applications, events, threads, teachers, messages, absences, minute],
+    [
+      listings,
+      savedIds,
+      applications,
+      events,
+      threads,
+      teachers,
+      messages,
+      absences,
+      assessments,
+      subjects,
+      minute,
+    ],
   );
 }

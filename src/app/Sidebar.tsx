@@ -8,13 +8,13 @@ import { useSettingsStore } from '@/stores/settings';
 import {
   FUTURE_NAV,
   isWithin,
-  PRIMARY_NAV,
   SETTINGS_NAV,
+  SIDEBAR_PRIMARY_NAV,
   type NavDestination,
 } from './navigation';
 import { useNavBadges } from './useNavBadges';
 
-/** Desktop navigation (≥1024px): brand, all eight destinations, and the student's name. */
+/** Desktop navigation (≥1024px): brand, all nine destinations, and the student's name. */
 export function Sidebar() {
   const { pathname } = useLocation();
   const badges = useNavBadges();
@@ -87,7 +87,7 @@ export function Sidebar() {
             className="pointer-events-none absolute inset-x-3 top-0 rounded-md bg-primary-soft"
           />
         ) : null}
-        <ul className="relative flex flex-col gap-0.5">{PRIMARY_NAV.map(renderItem)}</ul>
+        <ul className="relative flex flex-col gap-0.5">{SIDEBAR_PRIMARY_NAV.map(renderItem)}</ul>
         <p
           id="sidebar-future"
           className="px-3 pt-7 pb-2 text-caption font-semibold tracking-wide text-ink-3 uppercase"

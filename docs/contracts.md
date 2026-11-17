@@ -318,6 +318,7 @@ Errors: non-2xx with `{ error: { code, message } }`, `message` in Norwegian.
 | `POST /api/ai/info` | `InfoAskRequest` → SSE `StreamEvent`s (`delta`…, `sources`, `done`) |
 | `POST /api/ai/portfolio/describe` | `PortfolioDescribeRequest` → `PortfolioDescribeResponse` |
 | `POST /api/ai/application-text` | `ApplicationTextRequest` → SSE `StreamEvent`s (`delta`…, `done`) |
+| `POST /api/ai/timetable/pdf` | `TimetablePdfRequest` → `TimetablePdfResponse`; a PDF that is not a timetable is 422 `BAD_REQUEST` |
 | `GET /api/entur/geocode?q=&lat=&lon=` | → `GeocodeResponse` |
 | `POST /api/entur/trips` | `TripsRequest` → `TripsResponse` |
 
@@ -328,7 +329,8 @@ Errors: non-2xx with `{ error: { code, message } }`, `message` in Norwegian.
 - Entur goes through the backend only (`ET-Client-Name` header, short in-memory cache).
 
 Client (`@/lib/api`): one typed function per route – `getHealth`, `detectAbsence`,
-`streamInfoAnswer`, `describePortfolioEntry`, `streamApplicationText`, `geocode`, `planTrips`.
+`streamInfoAnswer`, `describePortfolioEntry`, `streamApplicationText`, `importTimetablePdf`,
+`geocode`, `planTrips`.
 They throw `ApiError` (`code`, `message` in Norwegian; `code: 'NETWORK'` when offline).
 Streaming functions take `{ onDelta, onSources?, signal }` and resolve with `{ mock }`.
 
@@ -419,3 +421,44 @@ Exports: `Page`, `PageHeader`, `Section`, `Card`, `Button`, `ButtonLink`, `IconB
   entries `pe-weld|circuit|lathe|box|vice`; listings `l-<company>`.
 - Seed week: Mon 08:15, Tue 09:55, Wed 08:15, Thu 08:15 at school then YFF 10:30–15:00 at the
   work placement (`location` set), Fri 08:15.
+
+## 11. Phase 3 additions
+
+Two workstreams run in parallel in the same folder. The rules in §9 still apply.
+
+### H – Vurderinger (assessment overview)
+
+An overview of the student's assessments: what is coming up, and what has been assessed
+with grade and feedback. Demo data only; nothing comes from a real school system.
+
+- Route `/vurderinger`, detail `/vurderinger/:assessmentId`. Nav label "Vurderinger".
+  Desktop sidebar: after Meldinger. Mobile: first item on the "Mer" page.
+- Types `Assessment`, `AssessmentResult`, `AssessmentKind`, `Grade` in `shared/types.ts`.
+- Store `useAssessmentStore` (`@/stores/assessments`, key `kompass:assessments`):
+  `assessments: Assessment[]`, `setSubmitted(id, submitted)`, `reset()`. Part of
+  `resetDemoData()`.
+- Seed `src/data/seed/assessments.ts`, dated relative to today like the other seeds.
+- A subject average is a plain mean of the graded assessments and is always labelled as
+  unofficial ("ikke en offisiell karakter").
+- Dashboard reminders include assessments in the next 7 days (`ReminderKind 'assessment'`,
+  link `/vurderinger/<id>`).
+- Owns: `src/features/assessments/**`, `src/stores/assessments.ts`, `src/stores/reset.ts`,
+  `src/data/seed/assessments.ts` (+ export in `seed/index.ts`), `src/app/navigation.ts`,
+  `src/app/router.tsx`, `src/app/Sidebar.tsx`, `src/app/MorePage.tsx`, and the reminder
+  files in `src/features/dashboard/`.
+
+### I – AI-powered PDF timetable import
+
+Visma InSchool cannot export `.ics`, only PDF. The import sheet therefore accepts a PDF, the
+backend lets Claude read it and answers with an iCalendar document, and that document goes
+through the existing `.ics` import (same parser, same preview, same confirm step).
+
+- `POST /api/ai/timetable/pdf`: `TimetablePdfRequest` → `TimetablePdfResponse` (`shared/api.ts`).
+  Client function `importTimetablePdf` in `@/lib/api`.
+- The model returns structured lessons; **the server builds the `.ics`** in a pure, tested
+  function. Lessons repeat weekly from `weekStart` until the end of the school year.
+- Prompt in `server/prompts/timetable.ts`. Mock mode answers with the sample timetable and
+  `mock: true`.
+- A PDF that is not a timetable gives a Norwegian error, never an empty import.
+- Owns: `server/**`, `shared/api.ts`, `src/lib/api.ts` (+ test), `src/features/timetable/**`,
+  `public/sample/**`.

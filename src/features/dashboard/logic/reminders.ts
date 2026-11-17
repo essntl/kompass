@@ -1,13 +1,17 @@
 import type {
   AbsenceRecord,
   Application,
+  Assessment,
   CalendarEvent,
   Listing,
   Message,
   Reminder,
+  Subject,
   Teacher,
   Thread,
 } from '@shared/types';
+import { KIND_LABELS } from '@/features/assessments/logic/labels';
+import { assessmentStatus, dueAt } from '@/features/assessments/logic/status';
 import { describeAbsence } from '@/lib/absence';
 import {
   daysUntil,
@@ -25,6 +29,10 @@ export const DEADLINE_HORIZON_DAYS = 30;
 export const URGENT_DEADLINE_DAYS = 7;
 /** Custom calendar events show up this many days ahead. */
 export const EVENT_HORIZON_DAYS = 14;
+/** Assessments show up this many days ahead. */
+export const ASSESSMENT_HORIZON_DAYS = 7;
+/** Assessments this close (today, tomorrow) are styled as urgent. */
+export const URGENT_ASSESSMENT_DAYS = 1;
 
 export interface ReminderSources {
   listings: Listing[];
@@ -37,11 +45,21 @@ export interface ReminderSources {
   teachers: Teacher[];
   messages: Message[];
   absences: AbsenceRecord[];
+  /** Upcoming assessments; hand-ins already handed in are left out. */
+  assessments: Assessment[];
+  /** For the subject name on assessment reminders. */
+  subjects: Subject[];
   now: Date;
 }
 
 /** Kind order for reminders that are due at the same moment. */
-const KIND_ORDER: Record<Reminder['kind'], number> = { message: 0, absence: 1, deadline: 2, event: 3 };
+const KIND_ORDER: Record<Reminder['kind'], number> = {
+  message: 0,
+  absence: 1,
+  assessment: 2,
+  deadline: 3,
+  event: 4,
+};
 
 function deadlineReminders({ listings, savedIds, applications, now }: ReminderSources): Reminder[] {
   const applied = new Set(applications.map((a) => a.listingId));
@@ -74,6 +92,23 @@ function eventReminders({ events, now }: ReminderSources): Reminder[] {
       due: e.start,
       href: `/timeplan?dato=${e.start.slice(0, 10)}`,
     }));
+}
+
+function assessmentReminders({ assessments, subjects, now }: ReminderSources): Reminder[] {
+  return assessments
+    .filter((a) => assessmentStatus(a, now) === 'upcoming')
+    .filter((a) => daysUntil(a.date, now) <= ASSESSMENT_HORIZON_DAYS)
+    .map((a) => {
+      const subject = subjects.find((s) => s.id === a.subjectId);
+      return {
+        id: `assessment-${a.id}`,
+        kind: 'assessment' as const,
+        title: a.title,
+        detail: [subject?.name, KIND_LABELS[a.kind]].filter(Boolean).join(' · '),
+        due: dueAt(a),
+        href: `/vurderinger/${a.id}`,
+      };
+    });
 }
 
 function messageReminders({ threads, teachers, messages }: ReminderSources): Reminder[] {
@@ -124,14 +159,16 @@ function absenceReminders({ absences, events, now }: ReminderSources): Reminder[
 
 /**
  * Everything the student should keep an eye on, derived from the stores:
- * unread messages (one per teacher), upcoming absences, saved listings with a deadline
- * within 30 days and custom calendar events within 14 days. Sorted by due time; unread
+ * unread messages (one per teacher), upcoming absences, assessments within 7 days (not
+ * hand-ins already handed in), saved listings with a deadline within 30 days and custom
+ * calendar events within 14 days. Sorted by due time; unread
  * messages are in the past, so they come first.
  */
 export function buildReminders(sources: ReminderSources): Reminder[] {
   return [
     ...messageReminders(sources),
     ...absenceReminders(sources),
+    ...assessmentReminders(sources),
     ...deadlineReminders(sources),
     ...eventReminders(sources),
   ].sort(
@@ -142,13 +179,12 @@ export function buildReminders(sources: ReminderSources): Reminder[] {
   );
 }
 
-/** A deadline within `URGENT_DEADLINE_DAYS`. */
+/** A deadline within `URGENT_DEADLINE_DAYS`, or an assessment today or tomorrow. */
 export function isUrgent(reminder: Reminder, now: Date): boolean {
-  return (
-    reminder.kind === 'deadline' &&
-    !!reminder.due &&
-    daysUntil(reminder.due, now) <= URGENT_DEADLINE_DAYS
-  );
+  if (!reminder.due) return false;
+  if (reminder.kind === 'deadline') return daysUntil(reminder.due, now) <= URGENT_DEADLINE_DAYS;
+  if (reminder.kind === 'assessment') return daysUntil(reminder.due, now) <= URGENT_ASSESSMENT_DAYS;
+  return false;
 }
 
 /** The short "when" label next to a reminder: "om 3 dager", "på onsdag kl. 18:00", "14:32". */
@@ -159,6 +195,7 @@ export function reminderWhen(reminder: Reminder, now: Date): string | null {
     case 'deadline':
       return formatDaysUntil(due, now);
     case 'event':
+    case 'assessment':
       return `${relativeDay(due, now)} kl. ${formatTime(due)}`;
     case 'message':
       return formatTimestamp(due, now);

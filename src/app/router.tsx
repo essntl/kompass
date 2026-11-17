@@ -1,5 +1,6 @@
 import { createBrowserRouter, type RouteObject } from 'react-router';
 import { routes as apprenticeshipRoutes } from '@/features/apprenticeships/routes';
+import { routes as assessmentRoutes } from '@/features/assessments/routes';
 import { routes as dashboardRoutes } from '@/features/dashboard/routes';
 import { routes as infoRoutes } from '@/features/info/routes';
 import { routes as messageRoutes } from '@/features/messages/routes';
@@ -29,6 +30,7 @@ const featureRoutes: RouteObject[] = [
   ...timetableRoutes,
   ...travelRoutes,
   ...messageRoutes,
+  ...assessmentRoutes,
   ...infoRoutes,
   ...portfolioRoutes,
   ...apprenticeshipRoutes,

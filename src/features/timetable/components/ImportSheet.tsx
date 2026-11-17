@@ -1,30 +1,40 @@
-import type { Place } from '@shared/types';
+import type { ISODate, Place } from '@shared/types';
 import {
   CalendarCheck,
   ChevronDown,
   Download,
   FileUp,
   MapPin,
+  Repeat,
   RotateCw,
+  Sparkles,
   TriangleExclamationPoint,
 } from 'lucide-react';
-import { useId, useRef, useState, type DragEvent } from 'react';
+import { useEffect, useId, useRef, useState, type DragEvent } from 'react';
 import {
   Badge,
   Button,
   Card,
   cn,
   Collapse,
+  DemoBadge,
   Sheet,
   Switch,
   toast,
   useIsDesktop,
 } from '@/components/ui';
-import { geocode } from '@/lib/api';
-import { formatDate, formatDayShort, formatTimeRange } from '@/lib/date';
+import { geocode, importTimetablePdf, isAbortError } from '@/lib/api';
+import { daysUntil, formatDate, formatDayShort, formatTimeRange, todayISO } from '@/lib/date';
 import { useMessagesStore } from '@/stores/messages';
 import { useSettingsStore } from '@/stores/settings';
 import { useTimetableStore } from '@/stores/timetable';
+import {
+  checkImportFile,
+  fileToBase64,
+  IMPORT_ACCEPT,
+  IMPORT_MESSAGES,
+  pdfImportErrorMessage,
+} from '../logic/importFile';
 import { upperFirst } from '../logic/labels';
 import {
   addressQuery,
@@ -33,6 +43,7 @@ import {
   offsiteSummary,
 } from '../logic/offsiteLocation';
 import { IcsParseError, parseIcs, type IcsEvent, type IcsParseResult } from '../logic/parseIcs';
+import { PdfReadingState } from './PdfReadingState';
 
 export interface ImportSheetProps {
   open: boolean;
@@ -40,10 +51,19 @@ export interface ImportSheetProps {
 }
 
 export const SAMPLE_ICS_URL = '/sample/eksempel-timeplan.ics';
-const MAX_BYTES = 5 * 1024 * 1024;
+export const SAMPLE_PDF_URL = '/sample/eksempel-timeplan.pdf';
 const PREVIEW_ROWS = 5;
+/** A PDF import shows its whole first week, so the student can check every lesson. */
+const PDF_PREVIEW_MAX_ROWS = 15;
 /** A geocoder that has not answered by then is skipped; the lesson stays at school. */
 const GEOCODE_TIMEOUT_MS = 6000;
+
+/** What the PDF route said about the calendar it built. */
+interface PdfImportInfo {
+  lessonCount: number;
+  repeatsUntil: ISODate | null;
+  mock: boolean;
+}
 
 /**
  * Looks up each distinct LOCATION that reads like a street address (work placement)
@@ -85,11 +105,10 @@ export function useLoadSampleTimetable() {
   };
 }
 
-function looksLikeIcs(file: File): boolean {
-  return /\.(ics|ical|ifb|icalendar)$/i.test(file.name) || file.type === 'text/calendar';
-}
-
-/** Import a timetable from an .ics file: pick or drop → preview → confirm. */
+/**
+ * Import a timetable: pick or drop a PDF (read by the AI on the server, which answers
+ * with an .ics) or an .ics file → the same preview → confirm.
+ */
 export function ImportSheet({ open, onOpenChange }: ImportSheetProps) {
   const isDesktop = useIsDesktop();
   const inputId = useId();
@@ -111,15 +130,34 @@ export function ImportSheet({ open, onOpenChange }: ImportSheetProps) {
   /** Lessons away from school, by LOCATION text; null while looking them up. */
   const [offsite, setOffsite] = useState<Map<string, Place> | null>(new Map());
   const lookup = useRef(0);
+  /** The PDF being read by the AI, while the request runs. */
+  const [pdfReading, setPdfReading] = useState<string | null>(null);
+  const pdfRequest = useRef<AbortController | null>(null);
+  const [pdfInfo, setPdfInfo] = useState<PdfImportInfo | null>(null);
+  /** A PDF whose request failed, so "Prøv igjen" can send it again. */
+  const [retryFile, setRetryFile] = useState<File | null>(null);
   const hasImported = events.some((e) => e.source === 'ics');
   const seedClasses = events.filter((e) => e.kind === 'class' && e.source === 'seed');
   const [replace, setReplace] = useState(true);
   const [removeSample, setRemoveSample] = useState(true);
 
+  // Never leave a paid request running after the sheet is gone.
+  useEffect(() => () => pdfRequest.current?.abort(), []);
+
+  function cancelPdf() {
+    pdfRequest.current?.abort();
+    pdfRequest.current = null;
+    setPdfReading(null);
+    if (inputRef.current) inputRef.current.value = '';
+  }
+
   function reset() {
+    cancelPdf();
     setResult(null);
     setFileName('');
     setError(null);
+    setRetryFile(null);
+    setPdfInfo(null);
     setShowSkipped(false);
     setOffsite(new Map());
     lookup.current += 1;
@@ -128,48 +166,89 @@ export function ImportSheet({ open, onOpenChange }: ImportSheetProps) {
 
   function close(next: boolean) {
     onOpenChange(next);
-    if (!next) window.setTimeout(reset, 300); // after the exit animation
+    if (!next) {
+      cancelPdf();
+      window.setTimeout(reset, 300); // after the exit animation
+    }
+  }
+
+  /** Parses .ics text (from a file or from the PDF route) and shows the preview. */
+  function showCalendar(text: string, name: string, info: PdfImportInfo | null) {
+    const parsed = parseIcs(text, {
+      // A PDF timetable repeats to the end of the school year, which can be further away
+      // than the default half-year window.
+      ...(info?.repeatsUntil
+        ? { weeksAhead: Math.max(26, Math.ceil(daysUntil(info.repeatsUntil) / 7) + 1) }
+        : {}),
+      matchTeacher: (description) =>
+        teachers.find((t) => description.toLowerCase().includes(t.name.toLowerCase()))?.id,
+    });
+    if (parsed.events.length === 0) {
+      setError(
+        parsed.outsideWindow > 0
+          ? 'Alle hendelsene i filen ligger utenfor perioden vi henter (fra fire uker tilbake til et halvt år fram).'
+          : 'Vi fant ingen timer i filen.',
+      );
+      return;
+    }
+    setFileName(name);
+    setPdfInfo(info);
+    setResult(parsed);
+    const run = ++lookup.current;
+    setOffsite(null);
+    void locateOffsite(parsed.events, school).then((found) => {
+      if (lookup.current === run) setOffsite(found);
+    });
+  }
+
+  async function readPdf(file: File) {
+    pdfRequest.current?.abort();
+    const controller = new AbortController();
+    pdfRequest.current = controller;
+    setPdfReading(file.name);
+    setRetryFile(null);
+    try {
+      const pdf = await fileToBase64(file);
+      const response = await importTimetablePdf(
+        { pdf, fileName: file.name, today: todayISO() },
+        { signal: controller.signal },
+      );
+      if (controller.signal.aborted) return;
+      showCalendar(response.ics, file.name, {
+        lessonCount: response.lessonCount,
+        repeatsUntil: response.repeatsUntil,
+        mock: response.mock,
+      });
+    } catch (caught) {
+      if (controller.signal.aborted || isAbortError(caught)) return;
+      setError(caught instanceof IcsParseError ? caught.message : pdfImportErrorMessage(caught));
+      setRetryFile(file);
+    } finally {
+      if (pdfRequest.current === controller) {
+        pdfRequest.current = null;
+        setPdfReading(null);
+      }
+    }
   }
 
   async function readFile(file: File | undefined) {
     if (!file) return;
     setError(null);
-    if (!looksLikeIcs(file)) {
-      setError('Det er ikke en kalenderfil. Velg en fil som slutter på .ics.');
+    setRetryFile(null);
+    const checked = checkImportFile(file);
+    if ('error' in checked) {
+      setError(checked.error);
       return;
     }
-    if (file.size > MAX_BYTES) {
-      setError('Filen er for stor. En timeplan er vanligvis under 1 MB.');
+    if (checked.kind === 'pdf') {
+      await readPdf(file);
       return;
     }
     setReading(true);
     try {
-      const text = await file.text();
-      const parsed = parseIcs(text, {
-        matchTeacher: (description) =>
-          teachers.find((t) => description.toLowerCase().includes(t.name.toLowerCase()))?.id,
-      });
-      if (parsed.events.length === 0) {
-        setError(
-          parsed.outsideWindow > 0
-            ? 'Alle hendelsene i filen ligger utenfor perioden vi henter (fra fire uker tilbake til et halvt år fram).'
-            : 'Vi fant ingen timer i filen.',
-        );
-        return;
-      }
-      setFileName(file.name);
-      setResult(parsed);
-      const run = ++lookup.current;
-      setOffsite(null);
-      void locateOffsite(parsed.events, school).then((found) => {
-        if (lookup.current === run) setOffsite(found);
-      });
+      showCalendar(await file.text(), file.name, null);
     } catch (caught) {
-      setError(
-        caught instanceof IcsParseError
-          ? caught.message
-          : 'Vi klarte ikke å lese filen. Prøv igjen, eller eksporter timeplanen på nytt.',
-      );
+      setError(caught instanceof IcsParseError ? caught.message : IMPORT_MESSAGES.readFailed);
     } finally {
       setReading(false);
     }
@@ -197,6 +276,7 @@ export function ImportSheet({ open, onOpenChange }: ImportSheetProps) {
   function onDrop(event: DragEvent<HTMLDivElement>) {
     event.preventDefault();
     setDragging(false);
+    if (pdfReading) return;
     void readFile(event.dataTransfer.files[0]);
   }
 
@@ -204,6 +284,7 @@ export function ImportSheet({ open, onOpenChange }: ImportSheetProps) {
   const first = result?.events[0];
   const last = result?.events.at(-1);
   const offsiteLabels = offsite ? [...offsite.values()].map((place) => place.label) : [];
+  const previewRows = pdfInfo ? Math.min(Math.max(pdfInfo.lessonCount, PREVIEW_ROWS), PDF_PREVIEW_MAX_ROWS) : PREVIEW_ROWS;
 
   const footer = result ? (
     <div className="flex gap-2">
@@ -214,17 +295,23 @@ export function ImportSheet({ open, onOpenChange }: ImportSheetProps) {
         Importer {result.events.length}
       </Button>
     </div>
+  ) : pdfReading ? (
+    <Button variant="secondary" fullWidth onClick={cancelPdf}>
+      Avbryt
+    </Button>
   ) : undefined;
 
   return (
     <Sheet
       open={open}
       onOpenChange={close}
-      title={result ? 'Se over importen' : 'Importer timeplan'}
+      title={result ? 'Se over importen' : pdfReading ? 'Leser timeplanen' : 'Importer timeplan'}
       description={
         result
           ? fileName
-          : 'Last ned timeplanen som .ics fra Visma InSchool (Timeplan → Eksporter) eller en annen kalender.'
+          : pdfReading
+            ? pdfReading
+            : 'Lagre timeplanen som PDF i Visma InSchool og velg filen her. En .ics-fil fra en annen kalender går også.'
       }
       footer={footer}
     >
@@ -239,6 +326,29 @@ export function ImportSheet({ open, onOpenChange }: ImportSheetProps) {
             {result.calendarName ? <p className="mt-1 text-small">{result.calendarName}</p> : null}
           </Card>
 
+          {pdfInfo ? (
+            <div className="flex flex-col gap-2 rounded-lg border border-line p-3 text-small">
+              {pdfInfo.mock ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  <DemoBadge />
+                  <span className="text-ink-2">Dette er eksempeldata, ikke timeplanen i PDF-en din.</span>
+                </div>
+              ) : null}
+              <p className="flex items-start gap-2 text-ink">
+                <Sparkles aria-hidden className="mt-0.5 size-4 shrink-0 text-ink-2" />
+                <span>Lest med KI fra PDF. Sjekk at timene stemmer før du importerer.</span>
+              </p>
+              <p className="flex items-start gap-2 text-ink-2">
+                <Repeat aria-hidden className="mt-0.5 size-4 shrink-0" />
+                <span>
+                  {pdfInfo.repeatsUntil
+                    ? `${pdfInfo.lessonCount} timer i uka, som gjentas hver uke til ${formatDate(pdfInfo.repeatsUntil)}.`
+                    : `${pdfInfo.lessonCount} timer, bare denne uka.`}
+                </span>
+              </p>
+            </div>
+          ) : null}
+
           {offsite === null ? (
             <p className="flex items-center gap-2 text-small text-ink-2">
               <MapPin aria-hidden className="size-4 shrink-0" />
@@ -252,9 +362,9 @@ export function ImportSheet({ open, onOpenChange }: ImportSheetProps) {
           ) : null}
 
           <div>
-            <h3 className="mb-2 text-small font-semibold text-ink">De første</h3>
+            <h3 className="mb-2 text-small font-semibold text-ink">{pdfInfo ? 'Første uke' : 'De første'}</h3>
             <ul className="divide-y divide-line rounded-lg border border-line">
-              {result.events.slice(0, PREVIEW_ROWS).map((event, index) => (
+              {result.events.slice(0, previewRows).map((event, index) => (
                 <li key={index} className="flex items-center gap-3 px-3 py-2.5">
                   <span className="w-24 shrink-0 text-small text-ink-2 nums">
                     {upperFirst(formatDayShort(event.start))}
@@ -269,8 +379,8 @@ export function ImportSheet({ open, onOpenChange }: ImportSheetProps) {
                 </li>
               ))}
             </ul>
-            {result.events.length > PREVIEW_ROWS ? (
-              <p className="mt-2 text-small text-ink-2">og {result.events.length - PREVIEW_ROWS} til.</p>
+            {result.events.length > previewRows ? (
+              <p className="mt-2 text-small text-ink-2">og {result.events.length - previewRows} til.</p>
             ) : null}
           </div>
 
@@ -336,6 +446,8 @@ export function ImportSheet({ open, onOpenChange }: ImportSheetProps) {
             ) : null}
           </div>
         </div>
+      ) : pdfReading ? (
+        <PdfReadingState fileName={pdfReading} />
       ) : (
         <div className="flex flex-col gap-4">
           <div
@@ -354,14 +466,17 @@ export function ImportSheet({ open, onOpenChange }: ImportSheetProps) {
             <span aria-hidden className="grid size-12 place-items-center rounded-lg bg-surface text-ink-2 [&_svg]:size-6">
               <FileUp />
             </span>
-            <p className="text-body font-semibold">
-              {isDesktop ? 'Slipp .ics-filen her' : 'Velg .ics-filen fra telefonen'}
-            </p>
+            <div>
+              <p className="text-body font-semibold">
+                {isDesktop ? 'Slipp PDF-en med timeplanen her' : 'Velg PDF-en med timeplanen'}
+              </p>
+              <p className="mt-1 text-small text-ink-2">Eller en .ics-fil fra en kalender</p>
+            </div>
             <input
               ref={inputRef}
               id={inputId}
               type="file"
-              accept=".ics,text/calendar"
+              accept={IMPORT_ACCEPT}
               className="sr-only"
               onChange={(event) => void readFile(event.target.files?.[0])}
             />
@@ -378,18 +493,38 @@ export function ImportSheet({ open, onOpenChange }: ImportSheetProps) {
           {error ? (
             <div role="alert" className="flex items-start gap-2 rounded-lg bg-danger-soft p-4 text-small text-danger-soft-ink">
               <TriangleExclamationPoint aria-hidden className="mt-0.5 size-4 shrink-0" />
-              <p>{error}</p>
+              <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
+                <p>{error}</p>
+                {retryFile ? (
+                  <Button size="sm" variant="secondary" icon={<RotateCw />} onClick={() => void readFile(retryFile)}>
+                    Prøv igjen
+                  </Button>
+                ) : null}
+              </div>
             </div>
           ) : null}
 
-          <a
-            href={SAMPLE_ICS_URL}
-            download="eksempel-timeplan.ics"
-            className="inline-flex min-h-11 items-center gap-2 self-start rounded-sm text-small font-semibold text-primary underline-offset-4 hover:underline"
-          >
-            <Download aria-hidden className="size-4" />
-            Last ned en eksempelfil å teste med
-          </a>
+          <div className="flex flex-col gap-1">
+            <p className="text-small text-ink-2">Har du ingen timeplan for hånden? Test med en eksempelfil:</p>
+            <div className="flex flex-wrap gap-x-5">
+              <a
+                href={SAMPLE_PDF_URL}
+                download="eksempel-timeplan.pdf"
+                className="inline-flex min-h-11 items-center gap-2 rounded-sm text-small font-semibold text-primary underline-offset-4 hover:underline"
+              >
+                <Download aria-hidden className="size-4" />
+                Last ned eksempel-PDF
+              </a>
+              <a
+                href={SAMPLE_ICS_URL}
+                download="eksempel-timeplan.ics"
+                className="inline-flex min-h-11 items-center gap-2 rounded-sm text-small font-semibold text-primary underline-offset-4 hover:underline"
+              >
+                <Download aria-hidden className="size-4" />
+                Last ned eksempel-.ics
+              </a>
+            </div>
+          </div>
 
           <div className="border-t border-line pt-4">
             <p className="font-semibold">Vil du bare se hvordan det ser ut?</p>

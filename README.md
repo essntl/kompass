@@ -57,8 +57,9 @@ Optional settings in `.env`: `API_PORT` (backend port, default 8787), `ANTHROPIC
 | Screen | Path | What it does |
 |---|---|---|
 | Hjem | `/` | Next class with countdown, "Gå hjemmefra kl. …", reminders, today's classes, editable quick links |
-| Timeplan | `/timeplan` | Day, week and list views with swipe; `.ics` import, manual entry, sample timetable |
+| Timeplan | `/timeplan` | Day, week and list views with swipe; AI import of a timetable PDF (Visma InSchool has no `.ics` export), `.ics` import, manual entry, sample timetable |
 | Reise | `/reise` | Daily travel plan from Entur: arrive 10–15 minutes before the first class, trip home, trips between locations, walking speed |
+| Vurderinger | `/vurderinger` | Upcoming tests and hand-ins, assessed work with grade and teacher feedback, unofficial averages per subject |
 | Meldinger | `/meldinger` | Chat with teachers (simulated replies), "Meld fravær", AI absence detection that suggests a calendar entry |
 | Info-hjørnet | `/info` | AI questions and answers with recommended sources, topic pages, an interactive education-path map, videos |
 | Portefølje | `/portefolje` | Entries with photo and note, AI competence descriptions, "Lag søknadstekst" |
@@ -111,12 +112,13 @@ docs/contracts.md              The contracts the parallel workstreams were built
 | `POST /api/ai/info` | Streams an answer, then 1–3 recommended sources |
 | `POST /api/ai/portfolio/describe` | Competence description from note and photo |
 | `POST /api/ai/application-text` | Streams an application draft |
+| `POST /api/ai/timetable/pdf` | Reads a timetable PDF and answers with an `.ics` document |
 | `GET /api/entur/geocode` | Address autocomplete |
 | `POST /api/entur/trips` | Trip search |
 
 ## Tests
 
-`npm test` runs about 480 unit tests. The two the project brief asked for specifically:
+`npm test` runs about 590 unit tests. The two the project brief asked for specifically:
 
 - Choosing the trip that arrives 10–15 minutes early:
   `src/features/travel/lib/tripSelection.test.ts`
@@ -128,7 +130,17 @@ docs/contracts.md              The contracts the parallel workstreams were built
 - Teachers, messages and their replies (canned replies after a short delay).
 - Absence notices and apprenticeship applications are stored locally; nothing is sent.
 - Apprenticeship listings and companies are invented.
+- Assessments, grades and teacher feedback are invented.
 - Seed portfolio images are illustrations standing in for photos.
-- AI answers when no API key is set.
+- AI answers when no API key is set. The PDF import then returns the sample week instead of
+  reading the file.
 
 Entur trip data and address search are real.
+
+### Importing a timetable from PDF
+
+Visma InSchool can only save the timetable as a PDF. In **Timeplan → Importer**, pick that
+PDF: the backend lets Claude read it, builds an `.ics` from the lessons it finds and runs it
+through the normal import preview. The lessons repeat weekly until 20 June of the school
+year, straight through holidays. The result is read by AI, so check the times before
+confirming. A sample PDF is at `public/sample/eksempel-timeplan.pdf`.

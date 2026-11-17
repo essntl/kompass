@@ -3,7 +3,7 @@
  * The client is passed in, so the functions can be tested with a fake.
  *
  * How each route gets structured data:
- * - absence-detect and portfolio/describe use structured outputs
+ * - absence-detect, portfolio/describe and timetable/pdf use structured outputs
  *   (`output_config.format` built with the SDK's `zodOutputFormat`). The stop reason is
  *   checked first, then the JSON is parsed and validated against the same zod schema.
  * - info streams the answer as plain text and gets the sources through the strict
@@ -20,6 +20,7 @@ import type {
   InfoAskRequest,
   PortfolioDescribeRequest,
   PortfolioDescribeResponse,
+  TimetablePdfRequest,
 } from '../../shared/api';
 import { INFO_SOURCES } from '../../shared/infoSources';
 import { absenceOutputSchema, buildAbsenceSystemPrompt, buildAbsenceUserPrompt } from '../prompts/absence';
@@ -39,6 +40,12 @@ import {
   portfolioOutputSchema,
   SKILLS_RANGE,
 } from '../prompts/portfolio';
+import {
+  buildTimetableSystemPrompt,
+  buildTimetableUserPrompt,
+  timetableOutputSchema,
+  type TimetableOutput,
+} from '../prompts/timetable';
 import { finalizeDetection } from './absence';
 import { AI_SETTINGS, assertNotRefused, baseParams, textOf } from './anthropic';
 import { HttpError, MESSAGES } from './errors';
@@ -55,10 +62,11 @@ async function requestStructured<Schema extends z.ZodType>(
   client: Anthropic,
   schema: Schema,
   params: Omit<Anthropic.MessageCreateParamsNonStreaming, 'output_config'> & { effort: Anthropic.OutputConfig['effort'] },
+  requestOptions?: Anthropic.RequestOptions,
 ): Promise<z.infer<Schema>> {
   const { effort, ...rest } = params;
   const format = zodOutputFormat(schema);
-  const message = await client.messages.create({ ...rest, output_config: { effort, format } });
+  const message = await client.messages.create({ ...rest, output_config: { effort, format } }, requestOptions);
 
   assertNotRefused(message);
   if (message.stop_reason === 'max_tokens') throw aiError('structured output was cut off at max_tokens');
@@ -124,6 +132,43 @@ export async function describePortfolioLive(
   return {
     competence: { summary, whatWasDone, skills, suggestedGoals, generatedAt: new Date().toISOString(), mock: false },
   };
+}
+
+// ---------------------------------------------------------------- timetable/pdf
+
+/** Reading a full-page PDF takes longer than the other routes; this overrides the client default. */
+export const TIMETABLE_PDF_TIMEOUT_MS = 90_000;
+
+/**
+ * Sends the PDF as a base64 `document` block (before the text, as the API recommends)
+ * and returns what the model read. Sanitizing, dates and the .ics are done by the caller
+ * (`buildTimetableResponse`), so this stays a thin reading step.
+ */
+export async function readTimetablePdfLive(
+  client: Anthropic,
+  request: TimetablePdfRequest,
+  signal?: AbortSignal,
+): Promise<TimetableOutput> {
+  const settings = AI_SETTINGS.timetablePdf;
+  return requestStructured(
+    client,
+    timetableOutputSchema,
+    {
+      ...baseParams(settings),
+      effort: settings.effort,
+      system: buildTimetableSystemPrompt(),
+      messages: [
+        {
+          role: 'user',
+          content: [
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: request.pdf } },
+            { type: 'text', text: buildTimetableUserPrompt(request) },
+          ],
+        },
+      ],
+    },
+    { signal, timeout: TIMETABLE_PDF_TIMEOUT_MS },
+  );
 }
 
 // ---------------------------------------------------------------- info (SSE)

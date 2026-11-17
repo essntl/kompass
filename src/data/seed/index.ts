@@ -17,3 +17,8 @@ export {
 export { SEED_UNREAD_THREAD_ID, buildSeedMessages, threadIdFor } from './messages';
 export { SEED_PORTFOLIO_PHOTOS, buildSeedPortfolio } from './portfolio';
 export { SEED_SAVED_LISTING_IDS, buildSeedListings } from './listings';
+export {
+  SEED_OVERDUE_ASSESSMENT_ID,
+  SEED_SUBMITTED_ASSESSMENT_ID,
+  buildSeedAssessments,
+} from './assessments';

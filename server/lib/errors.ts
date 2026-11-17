@@ -25,6 +25,9 @@ export const MESSAGES = {
   aiTimeout: 'AI-hjelperen brukte for lang tid. Prøv igjen.',
   aiRefusal: 'Dette kan jeg dessverre ikke hjelpe med. Prøv å spørre på en annen måte.',
   aiEmpty: 'AI-hjelperen ga et tomt svar. Prøv igjen.',
+  notPdf: 'Filen er ikke en PDF. Lagre timeplanen som PDF fra Visma InSchool og prøv igjen.',
+  pdfTooLarge: 'PDF-en er for stor. Den kan være på opptil 5 MB.',
+  notTimetable: 'Vi fant ingen timeplan i PDF-en. Prøv å lagre timeplanen på nytt fra Visma InSchool.',
   enturUnavailable: 'Fikk ikke kontakt med reiseplanleggeren (Entur). Prøv igjen om litt.',
 } as const;
 

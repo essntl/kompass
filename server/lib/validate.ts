@@ -4,8 +4,10 @@ import type {
   ApplicationTextRequest,
   InfoAskRequest,
   PortfolioDescribeRequest,
+  TimetablePdfRequest,
   TripsRequest,
 } from '../../shared/api';
+import { isValidISODate } from './dates';
 import { HttpError, MESSAGES } from './errors';
 
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
@@ -62,6 +64,23 @@ export const portfolioDescribeSchema = z.object({
     })
     .optional(),
 }) satisfies z.ZodType<PortfolioDescribeRequest>;
+
+/**
+ * A 5 MB PDF is ≈6.67 M base64 characters; the cap leaves a little slack and stays under
+ * the server's 8 MB JSON body limit. The decoded size and the `%PDF` header are checked by
+ * `decodePdf` in lib/timetable.ts.
+ */
+export const MAX_PDF_BASE64_CHARS = 7_000_000;
+
+export const timetablePdfSchema = z.object({
+  pdf: z
+    .string()
+    .min(8)
+    .max(MAX_PDF_BASE64_CHARS)
+    .regex(/^[A-Za-z0-9+/]+={0,2}$/),
+  fileName: z.string().max(255).optional(),
+  today: isoDate.refine(isValidISODate),
+}) satisfies z.ZodType<TimetablePdfRequest>;
 
 export const applicationTextSchema = z.object({
   student: z.object({
